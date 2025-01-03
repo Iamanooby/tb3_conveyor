@@ -12,6 +12,9 @@ class DynamixelStatus
     double max_wheel_angle = M_PI/2;
    double wheel_linear_vel[4] = {0.0, };//WHEEL_L_R, WHEEL_R_R, WHEEL_L_F, WHEEL_R_F
    double wheel_radian_angle[4] = {0.0, };//JOINT_L_R, JOINT_R_R, JOINT_L_F, JOINT_R_F
+   int32_t joint_angle[4] = {0, };//JOINT_L_R, JOINT_R_R, JOINT_L_F, JOINT_R_F //actual wheel angle
+   int32_t wheel_vel[4] = {0, };//WHEEL_L_R, WHEEL_R_R, WHEEL_L_F, WHEEL_R_F
+
 
  public:
 
@@ -84,11 +87,11 @@ class DynamixelStatus
         wheel_radian_angle[i]-= M_PI;
         wheel_linear_vel[i] = -wheel_linear_vel[i];
       }
-      Serial.print(i);
-      Serial.print(" Linear: ");
-      Serial.print(wheel_linear_vel[i]);
-      Serial.print(" , Angle: ");
-      Serial.println(wheel_radian_angle[i]);
+//      Serial.print(i);
+//      Serial.print(" Linear: ");
+//      Serial.print(wheel_linear_vel[i]);
+//      Serial.print(" , Angle: ");
+//      Serial.println(wheel_radian_angle[i]);
      }
 
    }
@@ -96,10 +99,6 @@ class DynamixelStatus
    int32_t* setJointAngle()//actual joint value
    {
 
-     int32_t joint_angle[4] = {0, };//JOINT_L_R, JOINT_R_R, JOINT_L_F, JOINT_R_F
-
-
-     //actual wheel angle
 
 
     //actual joint value
@@ -108,20 +107,12 @@ class DynamixelStatus
      {
       joint_angle[i] = static_cast<int>(round(wheel_radian_angle[i]/M_PI*4095/2)) + 2048;//because wheel goes from -pi/2 to pi/2 but joint goes from 1024 to 3072
 
-      Serial.print("Joint ");
-      Serial.print(i);
-      Serial.print(": ");
-      Serial.println(joint_angle[i]);
+//      Serial.print("Joint ");
+//      Serial.print(i);
+//      Serial.print(": ");
+//      Serial.println(joint_angle[i]);
      }
 
-    //  joint_angle[0] = JOINT_L_R;
-    //  joint_angle[1] = joint_l_r_angle + 2048;
-    //  joint_angle[2] = JOINT_R_R;
-    //  joint_angle[3] = joint_r_r_angle + 2048;
-    //  joint_angle[4] = JOINT_L_F;
-    //  joint_angle[5] = joint_l_f_angle + 2048;
-    //  joint_angle[6] = JOINT_R_F;
-    //  joint_angle[7] = joint_r_f_angle + 2048;
 
      return joint_angle;
    }
@@ -129,14 +120,8 @@ class DynamixelStatus
    int32_t* setWheelVel()//actual rotational velocity
    {
 
-     int32_t wheel_vel[4] = {0, };//WHEEL_L_R, WHEEL_R_R, WHEEL_L_F, WHEEL_R_F
     
      double linear_to_data = (1/(M_PI*2*0.033))*265/(60.69/60);//from m/s linear to rotational data. 0.033m is wheel radius, 265 data gives 60.69rpm
-    
-//     wheel_linear_vel[0] =wheel_l_r_vel*linear_to_angular;
-//     wheel_linear_vel[1] = wheel_r_r_vel*linear_to_angular;
-//     wheel_linear_vel[2] = wheel_l_f_vel*linear_to_angular;
-//     wheel_linear_vel[3] = wheel_r_f_vel*linear_to_angular;
 
 
      //scale all wheels down proportionally based on fastest wheel that exceeded speedlimit
@@ -160,22 +145,13 @@ class DynamixelStatus
      {
       wheel_vel[i] = static_cast<int>(round(wheel_linear_vel[i]*proportion*linear_to_data));
 
-      Serial.print("Wheel ");
-      Serial.print(i);
-      Serial.print(": ");
-      Serial.println(wheel_vel[i]);
+//      Serial.print("Wheel ");
+//      Serial.print(i);
+//      Serial.print(": ");
+//      Serial.println(wheel_vel[i]);
      }
 
-    //  wheel_vel[0] = WHEEL_L_R;
-    //  wheel_vel[1] = wheel_l_r_vel;
-    //  wheel_vel[2] = WHEEL_R_R;
-    //  wheel_vel[3] = wheel_r_r_vel;
-    //  wheel_vel[4] = WHEEL_L_F;
-    //  wheel_vel[5] = wheel_l_f_vel;
-    //  wheel_vel[6] = WHEEL_R_F;
-    //  wheel_vel[7] = wheel_r_f_vel;
 
-//    Serial.println(wheel_vel[3]);
 
      return wheel_vel;
    }

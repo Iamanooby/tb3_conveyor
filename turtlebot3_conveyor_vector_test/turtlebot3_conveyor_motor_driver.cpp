@@ -116,6 +116,7 @@ bool Turtlebot3MotorDriver::controlJoints(int32_t *value)
   int8_t dxl_comm_result_;
 
   dxl_addparam_result_ = groupSyncWritePosition_->addParam(JOINT_L_R, (uint8_t*)&value[0]);
+  
   if (dxl_addparam_result_ != true)
     return false;
 
@@ -149,7 +150,7 @@ bool Turtlebot3MotorDriver::controlWheels(int32_t *value)
 //  value[2] = 0;
 //  value[3] = 0;
   if (!value) {
-//    ROS_ERROR("Invalid velocity input: nullptr");
+  Serial.print("Invalid velocity input: nullptr");
     return false;
   }
 
@@ -160,6 +161,10 @@ bool Turtlebot3MotorDriver::controlWheels(int32_t *value)
 
   for (int i = 0; i < 4; ++i) {
     dxl_addparam_result_ = groupSyncWriteVelocity_->addParam(WHEELS[i], (uint8_t*)(&value[i]));
+//    Serial.print(i);
+//    Serial.print(" No. Wheel: ");
+//    Serial.println(dxl_addparam_result_);
+    
     if (dxl_addparam_result_ != true) {
 //      ROS_ERROR("Failed to add parameter for wheel %d", WHEELS[i]);
       return false;

@@ -11,7 +11,7 @@ uint8_t conveyor_wheel[4] = {WHEEL_L_R, WHEEL_R_R, WHEEL_L_F, WHEEL_R_F};
 bool motor_ready = false;
 
 //0.2,0.0,0.0
-double x_velocity = 1.0;
+double x_velocity = 0.0;
 double y_velocity = 0.0;
 double theta_velocity = 0.0;
 
@@ -20,7 +20,6 @@ void setup()
   Serial.begin(57600);
   // while(!Serial);
 
-//  rc100.begin(1);
   motor_ready= motor_driver.init();
 }
 
@@ -33,23 +32,28 @@ void loop()
   {
     String input = Serial.readStringUntil('\n'); // Read input until newline
     parseInput(input);
-    getmanualData();
-    conveyor.setJointAngle();
-    conveyor.setWheelVel();
-
-//    static uint32_t previous_time = 0;
-//    uint32_t present_time = millis();
-//  
-    
-//  
-//    if((present_time - previous_time) >= (LOOP_TIME_SEC * 1000))
-//    {
-//      motor_driver.controlJoints(conveyor.setJointAngle());
-//      motor_driver.controlWheels(conveyor.setWheelVel());
-//  
-//      previous_time = millis();
-//    }     
   }
+
+  
+  static uint32_t previous_time = 0;
+  uint32_t present_time = millis();
+  
+  getmanualData();
+
+
+  if((present_time - previous_time) >= (LOOP_TIME_SEC * 1000))
+  {
+    motor_driver.controlJoints(conveyor.setJointAngle());
+    motor_driver.controlWheels(conveyor.setWheelVel());
+//    Serial.println(motor_ready);
+//    Serial.print("Joint valid: ");
+//    Serial.println(motor_driver.controlJoints(conveyor.setJointAngle()));
+//    Serial.print("Wheel valid:");
+//    Serial.println(motor_driver.controlWheels(conveyor.setWheelVel()));
+
+    previous_time = millis();
+  }     
+  
 
 
 }

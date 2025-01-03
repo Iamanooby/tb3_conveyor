@@ -3,7 +3,6 @@
 
 #define LOOP_TIME_SEC 0.010f
 
-RC100 rc100;
 DynamixelStatus conveyor;
 Turtlebot3MotorDriver motor_driver;
 
@@ -11,9 +10,10 @@ uint8_t conveyor_joint[4] = {JOINT_L_R, JOINT_R_R, JOINT_L_F, JOINT_R_F};
 uint8_t conveyor_wheel[4] = {WHEEL_L_R, WHEEL_R_R, WHEEL_L_F, WHEEL_R_F};
 bool motor_ready = false;
 
-float x_velocity = 0.0;
-float y_velocity = 0.0;
-float theta_velocity = 0.0;
+//0.2,0.0,0.0
+double x_velocity = 1.0;
+double y_velocity = 0.0;
+double theta_velocity = 0.0;
 
 void setup()
 {
@@ -27,16 +27,20 @@ void setup()
 void loop()
 {
 
+
+
   if (Serial.available() > 0) 
   {
     String input = Serial.readStringUntil('\n'); // Read input until newline
     parseInput(input);
-
-
-    static uint32_t previous_time = 0;
-    uint32_t present_time = millis();
-  
     getmanualData();
+    conveyor.setJointAngle();
+    conveyor.setWheelVel();
+
+//    static uint32_t previous_time = 0;
+//    uint32_t present_time = millis();
+//  
+    
 //  
 //    if((present_time - previous_time) >= (LOOP_TIME_SEC * 1000))
 //    {
@@ -46,7 +50,7 @@ void loop()
 //      previous_time = millis();
 //    }     
   }
-  
+
 
 }
 

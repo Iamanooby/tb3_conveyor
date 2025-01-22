@@ -21,14 +21,15 @@
 
 #define TORQUE_ENABLE ControlTableItem::TORQUE_ENABLE
 
-enum MortorLocation{
+enum MotorLocation{
   LEFT = 0,
   RIGHT,
   MOTOR_NUM_MAX
 };
 
 enum VelocityType{
-  LINEAR = 0,
+  LINEAR_X = 0,
+  LINEAR_Y,
   ANGULAR,
   TYPE_NUM_MAX
 };

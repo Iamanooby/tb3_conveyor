@@ -223,7 +223,7 @@ bool Turtlebot3MotorDriver::control_motors(const float wheel_separation, float l
 {
   bool dxl_comm_result = false;
   
-  float wheel_velocity[MortorLocation::MOTOR_NUM_MAX];
+  float wheel_velocity[MotorLocation::MOTOR_NUM_MAX];
   float lin_vel = linear_value;
   float ang_vel = angular_value;
 

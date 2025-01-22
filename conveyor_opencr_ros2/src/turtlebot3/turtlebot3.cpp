@@ -813,7 +813,7 @@ static void dxl_slave_write_callback_func(uint16_t item_addr, uint8_t &dxl_err_c
       break;
 
     case ADDR_CMD_VEL_LINEAR_X:
-      goal_velocity_from_cmd[VelocityType::LINEAR] = constrain((float)(control_items.cmd_vel_linear[0]*0.01f), min_linear_velocity, max_linear_velocity);
+      goal_velocity_from_cmd[VelocityType::LINEAR] = constrain((float)(control_items.cmd_vel_linear[1]*0.01f), min_linear_velocity, max_linear_velocity);
       break;
 
     case ADDR_CMD_VEL_ANGULAR_Z:

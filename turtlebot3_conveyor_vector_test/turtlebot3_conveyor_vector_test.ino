@@ -82,11 +82,11 @@ void parseInput(String input) {
 
     // Print for debugging
     Serial.print("X Velocity: ");
-    Serial.println(x_velocity);
-    Serial.print("Y Velocity: ");
-    Serial.println(y_velocity);
-    Serial.print("Theta Velocity: ");
-    Serial.println(theta_velocity);
+    Serial.print(x_velocity,3);
+    Serial.print(", Y Velocity: ");
+    Serial.print(y_velocity,3);
+    Serial.print(", Theta Velocity: ");
+    Serial.println(theta_velocity,3);
   } else {
     Serial.println("Error: Invalid input format");
   }

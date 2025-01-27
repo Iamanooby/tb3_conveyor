@@ -58,7 +58,6 @@ class DynamixelStatus
      wheel_linear_vel[3] = sqrt(B * B + D * D);//wheel_r_f_vel
      wheel_radian_angle[3] = atan2(D, B)-(M_PI/4+M_PI/2*0);//joint_r_f_angle
 
-    
 
 // contraint angles to be between -pi and pi (since thats the range of atan2)
      for (int i=0;i<4;i++)
@@ -92,6 +91,7 @@ class DynamixelStatus
 //      Serial.print(wheel_linear_vel[i]);
 //      Serial.print(" , Angle: ");
 //      Serial.println(wheel_radian_angle[i]);
+
      }
 
    }
@@ -130,16 +130,17 @@ class DynamixelStatus
 //     Serial.println(limit_x_max_linear_veloctiy);
      double currentHighestSpeed = 0.0;//temp
      double proportion = 1.0;
+
+
+
      for (int i=0;i<4;i++)
      {
-      if(wheel_linear_vel[i]>limit_x_max_linear_veloctiy && wheel_linear_vel[i]>currentHighestSpeed)
+      if(abs(wheel_linear_vel[i])>limit_x_max_linear_veloctiy && abs(wheel_linear_vel[i])>currentHighestSpeed)
       {
-          currentHighestSpeed = wheel_linear_vel[i];
-          proportion = limit_x_max_linear_veloctiy/wheel_linear_vel[i];
+          currentHighestSpeed = abs(wheel_linear_vel[i]);
+          proportion = limit_x_max_linear_veloctiy/abs(wheel_linear_vel[i]);
       }
      }
-
-
   
      for (int i=0;i<4;i++)
      {
@@ -150,8 +151,6 @@ class DynamixelStatus
 //      Serial.print(": ");
 //      Serial.println(wheel_vel[i]);
      }
-
-
 
      return wheel_vel;
    }

@@ -179,7 +179,7 @@ bool Turtlebot3MotorDriver::controlWheels(int32_t *value)
 
   groupSyncWriteVelocity_->clearParam();
 
-  Serial.println("SUCCESS");
+  // Serial.println("SUCCESS");
   
   return true;
 }

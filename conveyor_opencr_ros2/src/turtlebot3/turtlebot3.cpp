@@ -16,6 +16,7 @@
 
 #include "../../include/turtlebot3/turtlebot3.h"
 
+
 /*******************************************************************************
 * Definition of dependency data according to TB3 model.
 *******************************************************************************/
@@ -63,8 +64,10 @@ static const TB3ModelInfo waffle_with_manipulator_info = {
 /*******************************************************************************
 * Declaration for motors
 *******************************************************************************/
+//new stuff heree!!!!!!
+static DynamixelStatus conveyor;
 static Turtlebot3MotorDriver motor_driver;
-static OpenManipulatorDriver manipulator_driver(motor_driver.getDxl());
+// static OpenManipulatorDriver manipulator_driver(motor_driver.getDxl());
 
 static const TB3ModelInfo* p_tb3_model_info;
 static float max_linear_velocity, min_linear_velocity;
@@ -315,6 +318,7 @@ typedef struct ControlItemVariables{
 }ControlItemVariables;
 
 static ControlItemVariables control_items;
+
 
 
 /*******************************************************************************

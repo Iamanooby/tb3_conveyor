@@ -1,6 +1,6 @@
 #include "math.h"
 
-#define BODY_LENGTH           25.6
+#define BODY_LENGTH           0.256
 #define SPEED_ADD_ON          1
 #define LIMIT_X_MAX_VELOCITY            250
 

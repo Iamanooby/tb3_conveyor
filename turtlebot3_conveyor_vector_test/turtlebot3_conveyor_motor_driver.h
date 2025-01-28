@@ -19,7 +19,12 @@
 #ifndef TURTLEBOT3_CONVEYOR_MOTOR_DRIVER_H_
 #define TURTLEBOT3_CONVEYOR_MOTOR_DRIVER_H_
 
+
 #include <DynamixelSDK.h>
+
+#define TORQUE_ENABLE ControlTableItem::TORQUE_ENABLE
+
+
 
 // Control table address (Dynamixel X-series)
 #define ADDR_X_TORQUE_ENABLE            64
@@ -44,6 +49,25 @@
 
 #define PROTOCOL_VERSION                2.0     // Dynamixel protocol version 2.0
 
+enum MotorLocation{
+  WHEEL_R_F = 1,
+  JOINT_R_F,
+  WHEEL_L_F,
+  JOINT_L_F,
+  JOINT_R_R,
+  WHEEL_R_R,
+  JOINT_L_R,
+  WHEEL_L_R,
+  MOTOR_NUM_MAX
+};
+
+enum VelocityType{
+  LINEAR_X = 0,
+  LINEAR_Y,
+  ANGULAR,
+  TYPE_NUM_MAX
+};
+
 #define WHEEL_L_R 8
 #define WHEEL_R_R 6
 #define WHEEL_L_F 3
@@ -66,8 +90,18 @@ class Turtlebot3MotorDriver
   Turtlebot3MotorDriver();
   ~Turtlebot3MotorDriver();
   bool init(void);
+  void close(void);//
   void closeDynamixel(void);
-  bool setTorque(uint8_t id, bool onoff);
+
+  bool motor_is_connected(uint8_t id);//
+  bool is_connected();//
+
+  bool set_torque(bool onoff);//for all motors
+  bool setMotorTorque(uint8_t id, bool onoff);
+  bool get_torque();//
+  bool getMotorTorque(uint8_t id);
+
+
   bool setProfileAcceleration(uint8_t id, uint32_t value);
   bool setProfileVelocity(uint8_t id, uint32_t value);
   bool controlJoints(int32_t *value);

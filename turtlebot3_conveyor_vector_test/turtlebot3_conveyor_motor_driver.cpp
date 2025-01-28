@@ -18,6 +18,9 @@
 
 #include "turtlebot3_conveyor_motor_driver.h"
 
+// #include "../../include/turtlebot3/turtlebot3_conveyor_motor_driver.h"
+
+
 Turtlebot3MotorDriver::Turtlebot3MotorDriver()
 : baudrate_(BAUDRATE),
   protocol_version_(PROTOCOL_VERSION)
@@ -59,15 +62,15 @@ bool Turtlebot3MotorDriver::init(void)
   }
 
   // Enable Dynamixel Torque
-  setTorque(WHEEL_L_R, true);
-  setTorque(WHEEL_R_R, true);
-  setTorque(WHEEL_L_F, true);
-  setTorque(WHEEL_R_F, true);
+  setMotorTorque(WHEEL_L_R, true);
+  setMotorTorque(WHEEL_R_R, true);
+  setMotorTorque(WHEEL_L_F, true);
+  setMotorTorque(WHEEL_R_F, true);
 
-  setTorque(JOINT_L_R, true);
-  setTorque(JOINT_R_R, true);
-  setTorque(JOINT_L_F, true);
-  setTorque(JOINT_R_F, true);
+  setMotorTorque(JOINT_L_R, true);
+  setMotorTorque(JOINT_R_R, true);
+  setMotorTorque(JOINT_L_F, true);
+  setMotorTorque(JOINT_R_F, true);
 
   groupSyncWriteVelocity_ = new dynamixel::GroupSyncWrite(portHandler_, packetHandler_, ADDR_X_GOAL_VELOCITY, LEN_X_GOAL_VELOCITY);
   groupSyncWritePosition_ = new dynamixel::GroupSyncWrite(portHandler_, packetHandler_, ADDR_X_GOAL_POSITION, LEN_X_GOAL_POSITION);
@@ -77,7 +80,89 @@ bool Turtlebot3MotorDriver::init(void)
   return true;
 }
 
-bool Turtlebot3MotorDriver::setTorque(uint8_t id, bool onoff)
+
+
+void Turtlebot3MotorDriver::close(void)
+{
+  // Disable Dynamixel Torque
+  closeDynamixel();
+}
+
+void Turtlebot3MotorDriver::closeDynamixel(void)
+{
+  // Disable Dynamixel Torque
+  setMotorTorque(WHEEL_L_R, false);
+  setMotorTorque(WHEEL_R_R, false);
+  setMotorTorque(WHEEL_L_F, false);
+  setMotorTorque(WHEEL_R_F, false);
+
+  setMotorTorque(JOINT_L_R, false);
+  setMotorTorque(JOINT_R_R, false);
+  setMotorTorque(JOINT_L_F, false);
+  setMotorTorque(JOINT_R_F, false);
+
+  // Close port
+  portHandler_->closePort();
+}
+
+bool Turtlebot3MotorDriver::motor_is_connected(uint8_t id)
+{
+  uint8_t dxl_error = 0;  
+  int dxl_comm_result = COMM_TX_FAIL;
+  dxl_comm_result = packetHandler_->ping(portHandler_, id, &dxl_error);
+  // dxl_comm_result = packetHandler->ping(portHandler, DXL_ID, &dxl_model_number, &dxl_error);
+
+
+  if (dxl_comm_result != COMM_SUCCESS)
+  {
+    packetHandler_->getTxRxResult(dxl_comm_result);
+    return false;
+  }
+  else if(dxl_error != 0)
+  {
+    packetHandler_->getRxPacketError(dxl_error);
+    return false;
+  }
+
+  return true;
+}
+
+bool Turtlebot3MotorDriver::is_connected()
+{
+  bool connected = true;
+  connected = connected && motor_is_connected(WHEEL_L_R);
+  connected = connected && motor_is_connected(WHEEL_R_R);
+  connected = connected && motor_is_connected(WHEEL_L_F);
+  connected = connected && motor_is_connected(WHEEL_R_F);
+  connected = connected && motor_is_connected(JOINT_L_R);
+  connected = connected && motor_is_connected(JOINT_R_R);
+  connected = connected && motor_is_connected(JOINT_L_F);
+  connected = connected && motor_is_connected(JOINT_R_F);
+  
+  return connected;
+  // return (dxl.ping(DXL_MOTOR_ID_LEFT) == true && dxl.ping(DXL_MOTOR_ID_RIGHT) == true);
+
+}
+
+bool Turtlebot3MotorDriver::set_torque(bool onoff)
+{
+
+  bool set_torque = true;
+  set_torque = set_torque && setMotorTorque(WHEEL_L_R, onoff);
+  set_torque = set_torque && setMotorTorque(WHEEL_R_R, onoff);
+  set_torque = set_torque && setMotorTorque(WHEEL_L_F, onoff);
+  set_torque = set_torque && setMotorTorque(WHEEL_R_F, onoff);
+
+  set_torque = set_torque && setMotorTorque(JOINT_L_R, onoff);
+  set_torque = set_torque && setMotorTorque(JOINT_R_R, onoff);
+  set_torque = set_torque && setMotorTorque(JOINT_L_F, onoff);
+  set_torque = set_torque && setMotorTorque(JOINT_R_F, onoff);
+
+  return set_torque;
+
+}
+
+bool Turtlebot3MotorDriver::setMotorTorque(uint8_t id, bool onoff)
 {
   uint8_t dxl_error = 0;
   int dxl_comm_result = COMM_TX_FAIL;
@@ -86,28 +171,60 @@ bool Turtlebot3MotorDriver::setTorque(uint8_t id, bool onoff)
   if(dxl_comm_result != COMM_SUCCESS)
   {
     packetHandler_->getTxRxResult(dxl_comm_result);
+    return false;
   }
   else if(dxl_error != 0)
   {
     packetHandler_->getRxPacketError(dxl_error);
+    return false;
   }
+
+  return true;
 }
 
-void Turtlebot3MotorDriver::closeDynamixel(void)
+bool Turtlebot3MotorDriver::get_torque()
 {
-  // Disable Dynamixel Torque
-  setTorque(WHEEL_L_R, false);
-  setTorque(WHEEL_R_R, false);
-  setTorque(WHEEL_L_F, false);
-  setTorque(WHEEL_R_F, false);
+  bool get_torque = true;
+  get_torque = get_torque && getMotorTorque(WHEEL_L_R);
+  get_torque = get_torque && getMotorTorque(WHEEL_R_R);
+  get_torque = get_torque && getMotorTorque(WHEEL_L_F);
+  get_torque = get_torque && getMotorTorque(WHEEL_R_F);
 
-  setTorque(JOINT_L_R, false);
-  setTorque(JOINT_R_R, false);
-  setTorque(JOINT_L_F, false);
-  setTorque(JOINT_R_F, false);
+  get_torque = get_torque && getMotorTorque(JOINT_L_R);
+  get_torque = get_torque && getMotorTorque(JOINT_R_R);
+  get_torque = get_torque && getMotorTorque(JOINT_L_F);
+  get_torque = get_torque && getMotorTorque(JOINT_R_F);
 
-  // Close port
-  portHandler_->closePort();
+  return get_torque;
+
+}
+
+bool Turtlebot3MotorDriver::getMotorTorque(uint8_t id)
+{
+  uint8_t onoff;
+  uint8_t dxl_error = 0;
+  int dxl_comm_result = COMM_TX_FAIL;
+
+  dxl_comm_result = packetHandler_->read1ByteTxRx(portHandler_, id, ADDR_X_TORQUE_ENABLE, &onoff, &dxl_error);
+  if(dxl_comm_result != COMM_SUCCESS)
+  {
+    packetHandler_->getTxRxResult(dxl_comm_result);
+    return false;
+  }
+  else if(dxl_error != 0)
+  {
+    packetHandler_->getRxPacketError(dxl_error);
+    return false;
+  }
+
+  if (onoff==0)
+  {
+    return false;
+  }
+  else
+  {
+    return true;
+  }
 }
 
 bool Turtlebot3MotorDriver::controlJoints(int32_t *value)

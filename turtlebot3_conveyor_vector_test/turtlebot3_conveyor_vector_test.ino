@@ -54,7 +54,8 @@ void loop()
     previous_time = millis();
   }     
   
-
+  // Serial.println(motor_driver.is_connected());
+  // Serial.println(motor_driver.get_torque());
 
 }
 

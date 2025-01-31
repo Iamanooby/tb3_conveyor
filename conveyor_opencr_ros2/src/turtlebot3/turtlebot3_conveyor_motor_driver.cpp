@@ -93,6 +93,12 @@ bool Turtlebot3MotorDriver::setTorque(uint8_t id, bool onoff)
   }
 }
 
+void Turtlebot3MotorDriver::close(void)
+{
+  // Disable Dynamixel Torque
+  closeDynamixel();
+}
+
 void Turtlebot3MotorDriver::closeDynamixel(void)
 {
   // Disable Dynamixel Torque

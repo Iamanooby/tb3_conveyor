@@ -21,7 +21,7 @@
 void setup()
 {
   // Begin TurtleBot3 core for support Burger.
-  TurtleBot3Core::begin("Burger");
+  TurtleBot3Core::begin();
 }
 
 /*******************************************************************************

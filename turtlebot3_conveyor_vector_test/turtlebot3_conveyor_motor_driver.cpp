@@ -368,20 +368,19 @@ bool Turtlebot3MotorDriver::controlJoints(int32_t *value)
   bool dxl_addparam_result_;
   int8_t dxl_comm_result_;
 
-  dxl_addparam_result_ = groupSyncWritePosition_->addParam(MotorLocation::JOINT_L_R, (uint8_t*)&value[0]);
-  
+  dxl_addparam_result_ = groupSyncWritePosition_->addParam(MotorLocation::JOINT_L_R, (uint8_t*)&value[MotorLocation::JOINT_L_R-4]);
   if (dxl_addparam_result_ != true)
     return false;
 
-  dxl_addparam_result_ = groupSyncWritePosition_->addParam(MotorLocation::JOINT_R_R, (uint8_t*)&value[1]);
+  dxl_addparam_result_ = groupSyncWritePosition_->addParam(MotorLocation::JOINT_R_R, (uint8_t*)&value[MotorLocation::JOINT_R_R-4]);
   if (dxl_addparam_result_ != true)
     return false;
 
-  dxl_addparam_result_ = groupSyncWritePosition_->addParam(MotorLocation::JOINT_L_F, (uint8_t*)&value[2]);
+  dxl_addparam_result_ = groupSyncWritePosition_->addParam(MotorLocation::JOINT_L_F, (uint8_t*)&value[MotorLocation::JOINT_L_F-4]);
   if (dxl_addparam_result_ != true)
     return false;
 
-  dxl_addparam_result_ = groupSyncWritePosition_->addParam(MotorLocation::JOINT_R_F, (uint8_t*)&value[3]);
+  dxl_addparam_result_ = groupSyncWritePosition_->addParam(MotorLocation::JOINT_R_F, (uint8_t*)&value[MotorLocation::JOINT_R_F-4]);
   if (dxl_addparam_result_ != true)
     return false;
 
@@ -410,19 +409,35 @@ bool Turtlebot3MotorDriver::controlWheels(int32_t *value)
   bool dxl_addparam_result_;
   int8_t dxl_comm_result_;
 
-  const int WHEELS[] = {MotorLocation::WHEEL_L_R, MotorLocation::WHEEL_R_R, MotorLocation::WHEEL_L_F, MotorLocation::WHEEL_R_F};
+  dxl_addparam_result_ = groupSyncWriteVelocity_->addParam(MotorLocation::WHEEL_L_R, (uint8_t*)&value[MotorLocation::WHEEL_L_R]);
+  if (dxl_addparam_result_ != true)
+    return false;
 
-  for (int i = 0; i < 4; ++i) {
-    dxl_addparam_result_ = groupSyncWriteVelocity_->addParam(WHEELS[i], (uint8_t*)(&value[i]));
-//    Serial.print(i);
-//    Serial.print(" No. Wheel: ");
-//    Serial.println(dxl_addparam_result_);
+  dxl_addparam_result_ = groupSyncWriteVelocity_->addParam(MotorLocation::WHEEL_R_R, (uint8_t*)&value[MotorLocation::WHEEL_R_R]);
+  if (dxl_addparam_result_ != true)
+    return false;
+
+  dxl_addparam_result_ = groupSyncWriteVelocity_->addParam(MotorLocation::WHEEL_L_F, (uint8_t*)&value[MotorLocation::WHEEL_L_F]);
+  if (dxl_addparam_result_ != true)
+    return false;
+
+  dxl_addparam_result_ = groupSyncWriteVelocity_->addParam(MotorLocation::WHEEL_R_F, (uint8_t*)&value[MotorLocation::WHEEL_R_F]);
+  if (dxl_addparam_result_ != true)
+    return false;
+
+//   const int WHEELS[] = {MotorLocation::WHEEL_L_R, MotorLocation::WHEEL_R_R, MotorLocation::WHEEL_L_F, MotorLocation::WHEEL_R_F};
+
+//   for (int i = 0; i < 4; ++i) {
+//     dxl_addparam_result_ = groupSyncWriteVelocity_->addParam(WHEELS[i], (uint8_t*)(&value[i]));
+// //    Serial.print(i);
+// //    Serial.print(" No. Wheel: ");
+// //    Serial.println(dxl_addparam_result_);
     
-    if (dxl_addparam_result_ != true) {
-//      ROS_ERROR("Failed to add parameter for wheel %d", WHEELS[i]);
-      return false;
-    }
-  }
+//     if (dxl_addparam_result_ != true) {
+// //      ROS_ERROR("Failed to add parameter for wheel %d", WHEELS[i]);
+//       return false;
+//     }
+//   }
 
   dxl_comm_result_ = groupSyncWriteVelocity_->txPacket();
   if (dxl_comm_result_ != COMM_SUCCESS) {

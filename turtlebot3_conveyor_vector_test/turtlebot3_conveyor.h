@@ -1,4 +1,6 @@
 #include "math.h"
+#include "turtlebot3_conveyor_motor_driver.h"
+
 
 #define BODY_LENGTH           0.256
 #define SPEED_ADD_ON          1
@@ -46,17 +48,17 @@ class DynamixelStatus
     // Calculate speed and angle for each wheel
 
 //add the correct angles to each
-     wheel_linear_vel[0]= sqrt(A * A + C * C);//wheel_l_r_vel
-     wheel_radian_angle[0] = atan2(C, A)+(M_PI/4+M_PI/2*1);//wheel_l_r_vel
+     wheel_linear_vel[MotorLocation::WHEEL_L_R]= sqrt(A * A + C * C);//wheel_l_r_vel
+     wheel_radian_angle[MotorLocation::JOINT_L_R-4] = atan2(C, A)+(M_PI/4+M_PI/2*1);//wheel_l_r_vel
 
-     wheel_linear_vel[1]= sqrt(B * B + C * C);//wheel_r_r_vel
-     wheel_radian_angle[1] = atan2(C, B)+(M_PI/4+M_PI/2*0);//joint_r_r_angle
+     wheel_linear_vel[MotorLocation::WHEEL_R_R]= sqrt(B * B + C * C);//wheel_r_r_vel
+     wheel_radian_angle[MotorLocation::JOINT_R_R-4] = atan2(C, B)+(M_PI/4+M_PI/2*0);//joint_r_r_angle
 
-     wheel_linear_vel[2] = sqrt(A * A + D * D);//wheel_l_f_vel
-     wheel_radian_angle[2] = atan2(D, A)-(M_PI/4+M_PI/2*1);//joint_l_f_angle
+     wheel_linear_vel[MotorLocation::WHEEL_L_F] = sqrt(A * A + D * D);//wheel_l_f_vel
+     wheel_radian_angle[MotorLocation::JOINT_L_F-4] = atan2(D, A)-(M_PI/4+M_PI/2*1);//joint_l_f_angle
 
-     wheel_linear_vel[3] = sqrt(B * B + D * D);//wheel_r_f_vel
-     wheel_radian_angle[3] = atan2(D, B)-(M_PI/4+M_PI/2*0);//joint_r_f_angle
+     wheel_linear_vel[MotorLocation::WHEEL_R_F] = sqrt(B * B + D * D);//wheel_r_f_vel
+     wheel_radian_angle[MotorLocation::JOINT_R_F-4] = atan2(D, B)-(M_PI/4+M_PI/2*0);//joint_r_f_angle
 
 
 // contraint angles to be between -pi and pi (since thats the range of atan2)

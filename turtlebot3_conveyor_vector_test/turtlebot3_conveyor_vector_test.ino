@@ -6,9 +6,9 @@
 DynamixelStatus conveyor;
 Turtlebot3MotorDriver motor_driver;
 
-uint8_t conveyor_joint[4] = {MotorLocation::JOINT_L_R, MotorLocation::JOINT_R_R, MotorLocation::JOINT_L_F, MotorLocation::JOINT_R_F};
-uint8_t conveyor_wheel[4] = {MotorLocation::WHEEL_L_R, MotorLocation::WHEEL_R_R, MotorLocation::WHEEL_L_F, MotorLocation::WHEEL_R_F};
-bool motor_ready = false;
+// uint8_t conveyor_joint[4] = {MotorLocation::JOINT_L_R, MotorLocation::JOINT_R_R, MotorLocation::JOINT_L_F, MotorLocation::JOINT_R_F};
+// uint8_t conveyor_wheel[4] = {MotorLocation::WHEEL_L_R, MotorLocation::WHEEL_R_R, MotorLocation::WHEEL_L_F, MotorLocation::WHEEL_R_F};
+// bool motor_ready = false;
 
 //0.2,0.0,0.0
 double x_velocity = 0.0;
@@ -20,7 +20,8 @@ void setup()
   Serial.begin(57600);
   // while(!Serial);
 
-  motor_ready= motor_driver.init();
+  // motor_ready= motor_driver.init();
+  motor_driver.init();
 }
 
 void loop()

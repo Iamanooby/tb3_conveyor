@@ -6,9 +6,7 @@
 DynamixelStatus conveyor;
 Turtlebot3MotorDriver motor_driver;
 
-// uint8_t conveyor_joint[4] = {MotorLocation::JOINT_L_R, MotorLocation::JOINT_R_R, MotorLocation::JOINT_L_F, MotorLocation::JOINT_R_F};
-// uint8_t conveyor_wheel[4] = {MotorLocation::WHEEL_L_R, MotorLocation::WHEEL_R_R, MotorLocation::WHEEL_L_F, MotorLocation::WHEEL_R_F};
-// bool motor_ready = false;
+
 
 //0.2,0.0,0.0
 double x_velocity = 0.0;
@@ -18,9 +16,7 @@ double theta_velocity = 0.0;
 void setup()
 {
   Serial.begin(57600);
-  // while(!Serial);
 
-  // motor_ready= motor_driver.init();
   motor_driver.init();
 }
 
@@ -61,14 +57,14 @@ void loop()
   // uint32_t input_profiles[MotorLocation::MOTOR_NUM_MAX]= {1,1,1,1,1,1,1,1};
   // motor_driver.write_profile_acceleration(input_profiles);
   // uint32_t output_profiles[MotorLocation::MOTOR_NUM_MAX];
-  // // int16_t currents[MotorLocation::MOTOR_NUM_MAX];
-  // motor_driver.read_profile_acceleration(output_profiles);
+  // int16_t currents[MotorLocation::MOTOR_NUM_MAX];
+  // motor_driver.read_present_current(currents);
   // for(int i = 0; i < MotorLocation::MOTOR_NUM_MAX;i++)
   // {
   //   Serial.print(" Pos ");
   //   Serial.print(i);
   //   Serial.print(" : ");
-  //   Serial.print(output_profiles[i]);
+  //   Serial.print(currents[i]);
   // }
   // Serial.println();
 

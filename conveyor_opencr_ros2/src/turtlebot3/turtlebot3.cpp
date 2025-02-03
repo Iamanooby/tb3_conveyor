@@ -23,8 +23,8 @@
 //new stuff heree!!!!!!
 static DynamixelStatus conveyor;
 static Turtlebot3MotorDriver motor_driver;
-uint8_t conveyor_joint[4] = {JOINT_L_R, JOINT_R_R, JOINT_L_F, JOINT_R_F};//cos placing this here works in previous ino file test
-uint8_t conveyor_wheel[4] = {WHEEL_L_R, WHEEL_R_R, WHEEL_L_F, WHEEL_R_F};//cos placing this here works in previous ino file test
+// uint8_t conveyor_joint[4] = {JOINT_L_R, JOINT_R_R, JOINT_L_F, JOINT_R_F};//cos placing this here works in previous ino file test
+// uint8_t conveyor_wheel[4] = {WHEEL_L_R, WHEEL_R_R, WHEEL_L_F, WHEEL_R_F};//cos placing this here works in previous ino file test
 #define LOOP_TIME_SEC 0.010f
 
 static float goal_velocity[VelocityType::TYPE_NUM_MAX] = {0.0, 0.0, 0.0};
@@ -219,6 +219,7 @@ typedef struct ControlItemVariables{
   int32_t present_velocity[MotorLocation::MOTOR_NUM_MAX];
   int32_t present_current[MotorLocation::MOTOR_NUM_MAX];
 
+
   bool motor_torque_enable_state;
   int32_t cmd_vel_linear[3];
   int32_t cmd_vel_angular[3];
@@ -254,12 +255,13 @@ void TurtleBot3Core::begin()
   ret = diagnosis.init();
   DEBUG_PRINTLN(ret==true?"Diagnosis setup completed.":"Diagnosis setup failed.");
   // Setting for ROBOTIS RC100 remote controller and cmd_vel
-  ret = controllers.init(max_linear_velocity, max_angular_velocity);
+  // ret = controllers.init(max_linear_velocity, max_angular_velocity);
+  ret = controllers.init(1.0, 1.0);
   DEBUG_PRINTLN(ret==true?"RC100 Controller setup completed.":"RC100 Controller setup failed.");
 
 
-  DEBUG_PRINT("Dynamixel2Arduino Item Max : ");
-  DEBUG_PRINTLN(CONTROL_ITEM_MAX);
+  // DEBUG_PRINT("Dynamixel2Arduino Item Max : ");
+  // DEBUG_PRINTLN(CONTROL_ITEM_MAX);
 
   control_items.debug_mode = false;
   control_items.is_connect_ros2_node = false;
@@ -467,7 +469,7 @@ void TurtleBot3Core::run()
       static uint32_t previous_time = 0;
       uint32_t present_time = millis();
 
-      conveyor.setParams(x_velocity,y_velocity,theta_velocity);
+      conveyor.setParams(goal_velocity[VelocityType::LINEAR_X],goal_velocity[VelocityType::LINEAR_Y],goal_velocity[VelocityType::ANGULAR]);
 
       if((present_time - previous_time) >= (LOOP_TIME_SEC * 1000))
       {
@@ -592,7 +594,9 @@ void update_imu(uint32_t interval_ms)
 void update_motor_status(uint32_t interval_ms)
 {
   static uint32_t pre_time;
-  int16_t current_l, current_r;
+  // int16_t current_l, current_r;
+  int16_t currents[MotorLocation::MOTOR_NUM_MAX];
+  
 
   if(millis() - pre_time >= interval_ms){
     pre_time = millis();
@@ -602,11 +606,23 @@ void update_motor_status(uint32_t interval_ms)
 
     pre_time_dxl = millis();
     if(get_connection_state_with_motors() == true){
-      motor_driver.read_present_position(control_items.present_position[MotorLocation::LEFT], control_items.present_position[MotorLocation::RIGHT]);
-      motor_driver.read_present_velocity(control_items.present_velocity[MotorLocation::LEFT], control_items.present_velocity[MotorLocation::RIGHT]);
-      if(motor_driver.read_present_current(current_l, current_r) == true){
-        control_items.present_current[MotorLocation::LEFT] = current_l;
-        control_items.present_current[MotorLocation::RIGHT] = current_r;
+      // motor_driver.read_present_position(control_items.present_position[MotorLocation::LEFT], control_items.present_position[MotorLocation::RIGHT]);
+      // motor_driver.read_present_velocity(control_items.present_velocity[MotorLocation::LEFT], control_items.present_velocity[MotorLocation::RIGHT]);
+      // if(motor_driver.read_present_current(current_l, current_r) == true){
+      //   control_items.present_current[MotorLocation::LEFT] = current_l;
+      //   control_items.present_current[MotorLocation::RIGHT] = current_r;
+      // }
+
+
+
+      motor_driver.read_present_position(control_items.present_position);
+      motor_driver.read_present_velocity(control_items.present_velocity);
+
+      if(motor_driver.read_present_current(currents) == true){
+        for (int i = 0; i<MotorLocation::MOTOR_NUM_MAX;i++)
+        {
+          control_items.present_current[i] = currents[i];
+        }
       }
 
       control_items.motor_torque_enable_state = motor_driver.get_torque();
@@ -649,21 +665,31 @@ static void dxl_slave_write_callback_func(uint16_t item_addr, uint8_t &dxl_err_c
       break;
 
     case ADDR_CMD_VEL_LINEAR_X:
-      goal_velocity_from_cmd[VelocityType::LINEAR_X] = constrain((float)(control_items.cmd_vel_linear[0]*0.01f), min_linear_velocity, max_linear_velocity);
+      // goal_velocity_from_cmd[VelocityType::LINEAR_X] = constrain((float)(control_items.cmd_vel_linear[0]*0.01f), min_linear_velocity, max_linear_velocity);
+      goal_velocity_from_cmd[VelocityType::LINEAR_X] = control_items.cmd_vel_linear[0]*0.01f;//this is because there is a *100 to cmd vel when sent via the linux cpp script
       break;
 
     case ADDR_CMD_VEL_LINEAR_Y:
-      goal_velocity_from_cmd[VelocityType::LINEAR_Y] = constrain((float)(control_items.cmd_vel_linear[1]*0.01f), min_linear_velocity, max_linear_velocity);
+      // goal_velocity_from_cmd[VelocityType::LINEAR_Y] = constrain((float)(control_items.cmd_vel_linear[1]*0.01f), min_linear_velocity, max_linear_velocity);
+      goal_velocity_from_cmd[VelocityType::LINEAR_Y] = control_items.cmd_vel_linear[1]*0.01f;
       break;
 
     case ADDR_CMD_VEL_ANGULAR_Z:
-      goal_velocity_from_cmd[VelocityType::ANGULAR] = constrain((float)(control_items.cmd_vel_angular[2]*0.01f), min_angular_velocity, max_angular_velocity);
+      // goal_velocity_from_cmd[VelocityType::ANGULAR] = constrain((float)(control_items.cmd_vel_angular[2]*0.01f), min_angular_velocity, max_angular_velocity);
+      goal_velocity_from_cmd[VelocityType::ANGULAR] = control_items.cmd_vel_angular[2]*0.01f;
       break;            
 
-    case ADDR_PROFILE_ACC_L:
-    case ADDR_PROFILE_ACC_R:
+    case ADDR_PROFILE_ACC_WHEEL_L_F:
+    case ADDR_PROFILE_ACC_WHEEL_R_F:
+    case ADDR_PROFILE_ACC_WHEEL_R_R:
+    case ADDR_PROFILE_ACC_WHEEL_L_R:
+    case ADDR_PROFILE_ACC_JOINT_R_F:
+    case ADDR_PROFILE_ACC_JOINT_L_F:
+    case ADDR_PROFILE_ACC_JOINT_R_R:
+    case ADDR_PROFILE_ACC_JOINT_L_R:
       if(get_connection_state_with_motors() == true)
-        motor_driver.write_profile_acceleration(control_items.profile_acceleration[MotorLocation::LEFT], control_items.profile_acceleration[MotorLocation::RIGHT]);
+        motor_driver.write_profile_acceleration(control_items.profile_acceleration);
+        // motor_driver.write_profile_acceleration(control_items.profile_acceleration[MotorLocation::LEFT], control_items.profile_acceleration[MotorLocation::RIGHT]);
       break;
   }
 }
@@ -752,69 +778,72 @@ const float TEST_RADIAN = 3.14; // 180 degree
 void test_motors_with_buttons(uint8_t buttons)
 {
 
-  if (buttons & (1<<0))  //hold one button to start moving
-  {
-    static uint32_t start_timing = millis();
+  // if (buttons & (1<<0))  //hold one button to start moving
+  // {
     
-    if(millis()-start_timing<1000)
+  //   static uint32_t start_timing = 0;
+  //   if(millis()-start_timing<1000)
+  //   {
+  //     goal_velocity_from_button[VelocityType::LINEAR_X]  = 0.05;
+  //     start_timing = millis();
+  //   }
+  //   else
+  //   {
+  //     goal_velocity_from_button[VelocityType::LINEAR_X]  = 0.0;
+  //   }
+  // }
+
+////////////////////////////////////////////////////////////////////////////
+
+  static bool move[VelocityType::TYPE_NUM_MAX] = {false, false,false};
+  // static int32_t saved_tick[2] = {0,0};
+  static double diff_encoder = 0.0;
+  static int32_t saved_tick[MotorLocation::MOTOR_NUM_MAX] = {0,};
+  // int32_t current_tick[2] = {0,0};
+  int32_t current_tick[MotorLocation::MOTOR_NUM_MAX] = {0,};
+
+
+  if(get_connection_state_with_motors() == true){
+    motor_driver.read_present_position(current_tick);
+  }
+
+  if (buttons & (1<<0))  
+  {
+    move[VelocityType::LINEAR_X] = true;
+    saved_tick[MotorLocation::WHEEL_L_R] = current_tick[MotorLocation::WHEEL_L_R];
+
+    diff_encoder = TEST_DISTANCE / (0.207 / 4096); // (Circumference of Wheel) / (The number of tick per revolution)
+  }
+  else if (buttons & (1<<1))
+  {
+    move[VelocityType::ANGULAR] = true;
+    saved_tick[MotorLocation::WHEEL_L_R] = current_tick[MotorLocation::WHEEL_L_R];
+
+    diff_encoder = (TEST_RADIAN * 0.13) / (0.207 / 4096);
+  }
+
+  if (move[VelocityType::LINEAR_X])
+  {    
+    if (abs(saved_tick[MotorLocation::WHEEL_L_R] - current_tick[MotorLocation::WHEEL_L_R]) <= diff_encoder)
     {
       goal_velocity_from_button[VelocityType::LINEAR_X]  = 0.05;
     }
     else
     {
       goal_velocity_from_button[VelocityType::LINEAR_X]  = 0.0;
+      move[VelocityType::LINEAR_X] = false;
     }
   }
-
-
-
-  // static bool move[VelocityType::TYPE_NUM_MAX] = {false, false,false};
-  // static int32_t saved_tick[2] = {0, 0};
-  // static double diff_encoder = 0.0;
-
-  // int32_t current_tick[2] = {0, 0};
-
-  // if(get_connection_state_with_motors() == true){
-  //   motor_driver.read_present_position(current_tick[MotorLocation::LEFT], current_tick[MotorLocation::RIGHT]);
-  // }
-
-  // if (buttons & (1<<0))  
-  // {
-  //   move[VelocityType::LINEAR_X] = true;
-  //   saved_tick[MotorLocation::RIGHT] = current_tick[MotorLocation::RIGHT];
-
-  //   diff_encoder = TEST_DISTANCE / (0.207 / 4096); // (Circumference of Wheel) / (The number of tick per revolution)
-  // }
-  // else if (buttons & (1<<1))
-  // {
-  //   move[VelocityType::ANGULAR] = true;
-  //   saved_tick[MotorLocation::RIGHT] = current_tick[MotorLocation::RIGHT];
-
-  //   diff_encoder = (TEST_RADIAN * p_tb3_model_info->turning_radius) / (0.207 / 4096);
-  // }
-
-  // if (move[VelocityType::LINEAR_X])
-  // {    
-  //   if (abs(saved_tick[MotorLocation::RIGHT] - current_tick[MotorLocation::RIGHT]) <= diff_encoder)
-  //   {
-  //     goal_velocity_from_button[VelocityType::LINEAR_X]  = 0.05;
-  //   }
-  //   else
-  //   {
-  //     goal_velocity_from_button[VelocityType::LINEAR_X]  = 0.0;
-  //     move[VelocityType::LINEAR_X] = false;
-  //   }
-  // }
-  // else if (move[VelocityType::ANGULAR])
-  // {   
-  //   if (abs(saved_tick[MotorLocation::RIGHT] - current_tick[MotorLocation::RIGHT]) <= diff_encoder)
-  //   {
-  //     goal_velocity_from_button[VelocityType::ANGULAR]= -0.7;
-  //   }
-  //   else
-  //   {
-  //     goal_velocity_from_button[VelocityType::ANGULAR]  = 0.0;
-  //     move[VelocityType::ANGULAR] = false;
-  //   }
-  // }
+  else if (move[VelocityType::ANGULAR])
+  {   
+    if (abs(saved_tick[MotorLocation::WHEEL_L_R] - current_tick[MotorLocation::WHEEL_L_R]) <= diff_encoder)
+    {
+      goal_velocity_from_button[VelocityType::ANGULAR]= -0.7;
+    }
+    else
+    {
+      goal_velocity_from_button[VelocityType::ANGULAR]  = 0.0;
+      move[VelocityType::ANGULAR] = false;
+    }
+  }
 }

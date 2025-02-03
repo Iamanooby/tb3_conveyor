@@ -33,6 +33,7 @@
 #define ADDR_X_PROFILE_VELOCITY         112
 #define ADDR_X_GOAL_POSITION            116
 #define ADDR_X_REALTIME_TICK            120
+#define ADDR_X_PRESENT_CURRENT          126
 #define ADDR_X_PRESENT_VELOCITY         128
 #define ADDR_X_PRESENT_POSITION         132
 
@@ -50,14 +51,15 @@
 #define PROTOCOL_VERSION                2.0     // Dynamixel protocol version 2.0
 
 enum MotorLocation{
-  WHEEL_R_F = 1,
-  JOINT_R_F,
-  WHEEL_L_F,
-  JOINT_L_F,
-  JOINT_R_R,
-  WHEEL_R_R,
-  JOINT_L_R,
-  WHEEL_L_R
+  WHEEL_L_R = 0,
+  WHEEL_R_R=1,
+  WHEEL_L_F=2,
+  WHEEL_R_F=3,
+
+  JOINT_L_R=4,
+  JOINT_R_R=5,
+  JOINT_L_F=6,
+  JOINT_R_F=7,
   MOTOR_NUM_MAX
 };
 
@@ -68,15 +70,6 @@ enum VelocityType{
   TYPE_NUM_MAX
 };
 
-#define WHEEL_L_R 8
-#define WHEEL_R_R 6
-#define WHEEL_L_F 3
-#define WHEEL_R_F 1
-
-#define JOINT_L_R 7
-#define JOINT_R_R 5
-#define JOINT_L_F 4
-#define JOINT_R_F 2
 
 #define BAUDRATE                        57600 // baud rate of Dynamixel
 #define DEVICENAME                      ""      // no need setting on OpenCR
@@ -93,14 +86,25 @@ class Turtlebot3MotorDriver
   void close(void);//
   void closeDynamixel(void);
 
+  bool motor_is_connected(uint8_t id);//
   bool is_connected();//
 
-  bool setTorque(uint8_t id, bool onoff);
+  bool set_torque(bool onoff);//for all motors
+  bool setMotorTorque(uint8_t id, bool onoff);
+  bool get_torque();//
+  bool getMotorTorque(uint8_t id);
+
+  bool read_present_position(int32_t positions[MotorLocation::MOTOR_NUM_MAX]);
+  bool read_present_velocity(int32_t velocities[MotorLocation::MOTOR_NUM_MAX]);
+  bool read_present_current(int16_t currents[MotorLocation::MOTOR_NUM_MAX]);
+  bool read_profile_acceleration(uint32_t profiles[MotorLocation::MOTOR_NUM_MAX]);
+
   bool setProfileAcceleration(uint8_t id, uint32_t value);
   bool setProfileVelocity(uint8_t id, uint32_t value);
   bool controlJoints(int32_t *value);
   bool controlWheels(int32_t *value);
 
+  bool write_profile_acceleration(uint32_t profiles[MotorLocation::MOTOR_NUM_MAX]);
 
  private:
   uint32_t baudrate_;

@@ -1,4 +1,6 @@
 #include "math.h"
+#include "turtlebot3_conveyor_motor_driver.h"
+
 
 #define BODY_LENGTH           0.256
 #define SPEED_ADD_ON          1
@@ -18,14 +20,6 @@ class DynamixelStatus
 
  public:
 
-//   double wheel_l_r_vel, wheel_r_r_vel, wheel_l_f_vel, wheel_r_f_vel;
-//   double joint_l_r_angle, joint_r_r_angle, joint_l_f_angle, joint_r_f_angle;
-
-//   DynamixelStatus()
-//   : wheel_l_r_vel(0.0), wheel_r_r_vel(0.0), wheel_l_f_vel(0.0), wheel_r_f_vel(0.0)
-//   , joint_l_r_angle(0.0), joint_r_r_angle(0.0), joint_l_f_angle(0.0), joint_r_f_angle(0.0)
-//   { }
-
    void setParams(double x, double y, double omega)
    {
     double L = BODY_LENGTH/2; // Length
@@ -39,24 +33,20 @@ class DynamixelStatus
     double C = y - omega * (W);
     double D = y + omega * (W);//omega*R*W/R
 
-//    Serial.println(A);
-//    Serial.println(B);
-//    Serial.println(C);
-//    Serial.println(D);
     // Calculate speed and angle for each wheel
 
 //add the correct angles to each
-     wheel_linear_vel[0]= sqrt(A * A + C * C);//wheel_l_r_vel
-     wheel_radian_angle[0] = atan2(C, A)+(M_PI/4+M_PI/2*1);//wheel_l_r_vel
+     wheel_linear_vel[MotorLocation::WHEEL_L_R]= sqrt(A * A + C * C);//wheel_l_r_vel
+     wheel_radian_angle[MotorLocation::JOINT_L_R-4] = atan2(C, A)+(M_PI/4+M_PI/2*1);//wheel_l_r_vel
 
-     wheel_linear_vel[1]= sqrt(B * B + C * C);//wheel_r_r_vel
-     wheel_radian_angle[1] = atan2(C, B)+(M_PI/4+M_PI/2*0);//joint_r_r_angle
+     wheel_linear_vel[MotorLocation::WHEEL_R_R]= sqrt(B * B + C * C);//wheel_r_r_vel
+     wheel_radian_angle[MotorLocation::JOINT_R_R-4] = atan2(C, B)+(M_PI/4+M_PI/2*0);//joint_r_r_angle
 
-     wheel_linear_vel[2] = sqrt(A * A + D * D);//wheel_l_f_vel
-     wheel_radian_angle[2] = atan2(D, A)-(M_PI/4+M_PI/2*1);//joint_l_f_angle
+     wheel_linear_vel[MotorLocation::WHEEL_L_F] = sqrt(A * A + D * D);//wheel_l_f_vel
+     wheel_radian_angle[MotorLocation::JOINT_L_F-4] = atan2(D, A)-(M_PI/4+M_PI/2*1);//joint_l_f_angle
 
-     wheel_linear_vel[3] = sqrt(B * B + D * D);//wheel_r_f_vel
-     wheel_radian_angle[3] = atan2(D, B)-(M_PI/4+M_PI/2*0);//joint_r_f_angle
+     wheel_linear_vel[MotorLocation::WHEEL_R_F] = sqrt(B * B + D * D);//wheel_r_f_vel
+     wheel_radian_angle[MotorLocation::JOINT_R_F-4] = atan2(D, B)-(M_PI/4+M_PI/2*0);//joint_r_f_angle
 
 
 // contraint angles to be between -pi and pi (since thats the range of atan2)
@@ -86,11 +76,6 @@ class DynamixelStatus
         wheel_radian_angle[i]-= M_PI;
         wheel_linear_vel[i] = -wheel_linear_vel[i];
       }
-//      Serial.print(i);
-//      Serial.print(" Linear: ");
-//      Serial.print(wheel_linear_vel[i]);
-//      Serial.print(" , Angle: ");
-//      Serial.println(wheel_radian_angle[i]);
 
      }
 
@@ -107,10 +92,6 @@ class DynamixelStatus
      {
       joint_angle[i] = static_cast<int>(round(wheel_radian_angle[i]/M_PI*4095/2)) + 2048;//because wheel goes from -pi/2 to pi/2 but joint goes from 1024 to 3072
 
-//      Serial.print("Joint ");
-//      Serial.print(i);
-//      Serial.print(": ");
-//      Serial.println(joint_angle[i]);
      }
 
 
@@ -126,8 +107,7 @@ class DynamixelStatus
 
      //scale all wheels down proportionally based on fastest wheel that exceeded speedlimit
      const double limit_x_max_linear_veloctiy = LIMIT_X_MAX_VELOCITY/linear_to_data;//change max from data value to linear instead
-//     Serial.print("MAX SPEED: ");
-//     Serial.println(limit_x_max_linear_veloctiy);
+
      double currentHighestSpeed = 0.0;//temp
      double proportion = 1.0;
 
@@ -146,61 +126,9 @@ class DynamixelStatus
      {
       wheel_vel[i] = static_cast<int>(round(wheel_linear_vel[i]*proportion*linear_to_data));
 
-//      Serial.print("Wheel ");
-//      Serial.print(i);
-//      Serial.print(": ");
-//      Serial.println(wheel_vel[i]);
      }
 
      return wheel_vel;
    }
 };
 
-
-/*
-1. Basic Motions
-
-    FORWARD (RC100_BTN_U)
-        Move forward with no rotation.
-    BACKWARD (RC100_BTN_D)
-        Move backward with no rotation.
-    Rotate Left (RC100_BTN_L)
-        Rotate the robot counterclockwise (pivot in place).
-    Rotate Right (RC100_BTN_R)
-        Rotate the robot clockwise (pivot in place).
-    Point Left (RC100_BTN_2)
-        The robot strafes left (translation) without rotation.
-    Point Right (RC100_BTN_4)
-        The robot strafes right (translation) without rotation.
-
-2. Combined Motions
-
-    Diagonal/Complex Translations:
-        Left-Forward (RC100_BTN_U + RC100_BTN_L): Moves diagonally forward to the left.
-        Right-Forward (RC100_BTN_U + RC100_BTN_R): Moves diagonally forward to the right.
-        Left-Backward (RC100_BTN_D + RC100_BTN_L): Moves diagonally backward to the left.
-        Right-Backward (RC100_BTN_D + RC100_BTN_R): Moves diagonally backward to the right.
-
-    Pivoting While Moving:
-        Point Left + Forward (RC100_BTN_U + RC100_BTN_2): Combines strafing left with forward motion.
-        Point Right + Forward (RC100_BTN_U + RC100_BTN_4): Combines strafing right with forward motion.
-        Similar motions for backward directions.
-
-3. Rotation + Translation
-
-    Rotate + Strafe Combinations:
-        Rotate Left + Point Left (RC100_BTN_L + RC100_BTN_6): Rotates left while strafing left.
-        Rotate Left + Point Right (RC100_BTN_L + RC100_BTN_5): Rotates left while strafing right.
-        Rotate Right + Point Left (RC100_BTN_R + RC100_BTN_6): Rotates right while strafing left.
-        Rotate Right + Point Right (RC100_BTN_R + RC100_BTN_5): Rotates right while strafing right.
-
-4. Complex Compound Motions
-
-    Triple Button Combinations:
-        Rotate Left + Point Left + Forward (RC100_BTN_L + RC100_BTN_6 + RC100_BTN_U)
-            Combines rotation, strafing, and forward motion.
-        Rotate Right + Point Right + Backward (RC100_BTN_R + RC100_BTN_5 + RC100_BTN_D)
-            Combines rotation, strafing, and backward motion.
-        Additional triple button combinations create similar behaviors in different directions.
-
-*/

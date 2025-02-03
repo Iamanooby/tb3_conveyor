@@ -110,7 +110,6 @@ bool Turtlebot3MotorDriver::motor_is_connected(uint8_t id)
   uint8_t dxl_error = 0;  
   int dxl_comm_result = COMM_TX_FAIL;
   dxl_comm_result = packetHandler_->ping(portHandler_, id, &dxl_error);
-  // dxl_comm_result = packetHandler->ping(portHandler, DXL_ID, &dxl_model_number, &dxl_error);
 
 
   if (dxl_comm_result != COMM_SUCCESS)
@@ -140,7 +139,6 @@ bool Turtlebot3MotorDriver::is_connected()
   connected = connected && motor_is_connected(MotorLocation::JOINT_R_F);
   
   return connected;
-  // return (dxl.ping(DXL_MOTOR_ID_LEFT) == true && dxl.ping(DXL_MOTOR_ID_RIGHT) == true);
 
 }
 
@@ -397,10 +395,7 @@ bool Turtlebot3MotorDriver::controlJoints(int32_t *value)
 
 bool Turtlebot3MotorDriver::controlWheels(int32_t *value)
 {
-//  value[0] = 0;
-//  value[1] = 0;
-//  value[2] = 0;
-//  value[3] = 0;
+
   if (!value) {
   Serial.print("Invalid velocity input: nullptr");
     return false;
@@ -425,29 +420,15 @@ bool Turtlebot3MotorDriver::controlWheels(int32_t *value)
   if (dxl_addparam_result_ != true)
     return false;
 
-//   const int WHEELS[] = {MotorLocation::WHEEL_L_R, MotorLocation::WHEEL_R_R, MotorLocation::WHEEL_L_F, MotorLocation::WHEEL_R_F};
 
-//   for (int i = 0; i < 4; ++i) {
-//     dxl_addparam_result_ = groupSyncWriteVelocity_->addParam(WHEELS[i], (uint8_t*)(&value[i]));
-// //    Serial.print(i);
-// //    Serial.print(" No. Wheel: ");
-// //    Serial.println(dxl_addparam_result_);
-    
-//     if (dxl_addparam_result_ != true) {
-// //      ROS_ERROR("Failed to add parameter for wheel %d", WHEELS[i]);
-//       return false;
-//     }
-//   }
 
   dxl_comm_result_ = groupSyncWriteVelocity_->txPacket();
   if (dxl_comm_result_ != COMM_SUCCESS) {
-//    ROS_ERROR("Transmission failed: %s", packetHandler_->getTxRxResult(dxl_comm_result_));
     return false;
   }
 
   groupSyncWriteVelocity_->clearParam();
 
-  // Serial.println("SUCCESS");
   
   return true;
 }

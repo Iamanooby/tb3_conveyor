@@ -70,35 +70,6 @@ enum VelocityType{
   TYPE_NUM_MAX
 };
 
-// #define WHEEL_L_R 8
-// #define WHEEL_R_R 6
-// #define WHEEL_L_F 3
-// #define WHEEL_R_F 1
-
-// #define JOINT_L_R 7
-// #define JOINT_R_R 5
-// #define JOINT_L_F 4
-// #define JOINT_R_F 2
-
-// #define WHEEL_L_R 1
-// #define WHEEL_R_R 0
-// #define WHEEL_L_F 3
-// #define WHEEL_R_F 2
-
-// #define JOINT_L_R 5
-// #define JOINT_R_R 4
-// #define JOINT_L_F 7
-// #define JOINT_R_F 6
-
-// #define WHEEL_L_R 0
-// #define WHEEL_R_R 1
-// #define WHEEL_L_F 2
-// #define WHEEL_R_F 3
-
-// #define JOINT_L_R 4
-// #define JOINT_R_R 5
-// #define JOINT_L_F 6
-// #define JOINT_R_F 7
 
 #define BAUDRATE                        57600 // baud rate of Dynamixel
 #define DEVICENAME                      ""      // no need setting on OpenCR

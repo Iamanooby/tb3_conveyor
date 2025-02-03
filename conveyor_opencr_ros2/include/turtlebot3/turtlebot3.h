@@ -43,7 +43,7 @@ const uint32_t INTERVAL_MS_TO_CONTROL_MOTOR = 20;
 const uint32_t INTERVAL_MS_TO_UPDATE_CONTROL_ITEM = 20;
 
 namespace TurtleBot3Core{
-  void begin(const char* model_name);
+  void begin();
   void run();
 } //namespace TurtleBot3Core
 

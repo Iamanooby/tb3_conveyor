@@ -429,7 +429,7 @@ void TurtleBot3Core::run()
   // Update Voltage
   diagnosis.updateVoltageCheck(true);
   // Check push button pressed for simple test drive
-  test_motors_with_buttons(diagnosis.getButtonPress(3000));
+  test_motors_with_buttons(diagnosis.getButtonPress(3000));//////////////
 
   /* For sensing and run buzzer */
   // Update the IMU unit
@@ -448,7 +448,7 @@ void TurtleBot3Core::run()
   update_imu(INTERVAL_MS_TO_UPDATE_CONTROL_ITEM);
   update_times(INTERVAL_MS_TO_UPDATE_CONTROL_ITEM);
   update_gpios(INTERVAL_MS_TO_UPDATE_CONTROL_ITEM);
-  update_motor_status(INTERVAL_MS_TO_UPDATE_CONTROL_ITEM);
+  update_motor_status(INTERVAL_MS_TO_UPDATE_CONTROL_ITEM);///////////////
   update_battery_status(INTERVAL_MS_TO_UPDATE_CONTROL_ITEM);
   update_analog_sensors(INTERVAL_MS_TO_UPDATE_CONTROL_ITEM);
 

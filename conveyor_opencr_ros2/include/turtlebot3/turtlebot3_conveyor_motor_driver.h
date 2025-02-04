@@ -19,8 +19,8 @@
 #ifndef TURTLEBOT3_CONVEYOR_MOTOR_DRIVER_H_
 #define TURTLEBOT3_CONVEYOR_MOTOR_DRIVER_H_
 
-
-#include <DynamixelSDK.h>
+#include <Dynamixel2Arduino.h>//for turtlebot3.cpp
+#include <DynamixelSDK.h>//for driving motors
 
 #define TORQUE_ENABLE ControlTableItem::TORQUE_ENABLE
 

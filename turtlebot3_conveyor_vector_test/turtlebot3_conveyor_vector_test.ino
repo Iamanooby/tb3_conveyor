@@ -55,16 +55,23 @@ void loop()
   // Serial.println(motor_driver.get_torque());
 
   // uint32_t input_profiles[MotorLocation::MOTOR_NUM_MAX]= {1,1,1,1,1,1,1,1};
-  // motor_driver.write_profile_acceleration(input_profiles);
-  // uint32_t output_profiles[MotorLocation::MOTOR_NUM_MAX];
-  // int16_t currents[MotorLocation::MOTOR_NUM_MAX];
-  // motor_driver.read_present_current(currents);
+  uint32_t input_profiles[MotorLocation::MOTOR_NUM_MAX]= {0,};
+  motor_driver.write_profile_acceleration(input_profiles);
+  int32_t positions[MotorLocation::MOTOR_NUM_MAX];
+  int32_t velocities[MotorLocation::MOTOR_NUM_MAX];
+  uint32_t output_profiles[MotorLocation::MOTOR_NUM_MAX];
+  int16_t currents[MotorLocation::MOTOR_NUM_MAX];
+  // motor_driver.get_torque();
+  motor_driver.read_present_position(positions);
+  motor_driver.read_present_velocity(velocities);
+  motor_driver.read_profile_acceleration(output_profiles);
+  motor_driver.read_present_current(currents);
   // for(int i = 0; i < MotorLocation::MOTOR_NUM_MAX;i++)
   // {
   //   Serial.print(" Pos ");
   //   Serial.print(i);
   //   Serial.print(" : ");
-  //   Serial.print(currents[i]);
+  //   Serial.print(output_profiles[i]);
   // }
   // Serial.println();
 

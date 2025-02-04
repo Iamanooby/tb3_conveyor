@@ -42,9 +42,11 @@
 
 // Data Byte Length
 #define LEN_X_TORQUE_ENABLE             1
+#define LEN_X_PROFILE_ACCELERATION      4
 #define LEN_X_GOAL_VELOCITY             4
 #define LEN_X_GOAL_POSITION             4
 #define LEN_X_REALTIME_TICK             2
+#define LEN_X_PRESENT_CURRENT           2
 #define LEN_X_PRESENT_VELOCITY          4
 #define LEN_X_PRESENT_POSITION          4
 
@@ -115,6 +117,11 @@ class Turtlebot3MotorDriver
 
   dynamixel::GroupSyncWrite *groupSyncWriteVelocity_;
   dynamixel::GroupSyncWrite *groupSyncWritePosition_;
+  dynamixel::GroupSyncWrite *groupSyncWriteProfileAcc_;
+  dynamixel::GroupSyncRead *groupSyncReadPosition_;
+  dynamixel::GroupSyncRead *groupSyncReadVelocity_;
+  dynamixel::GroupSyncRead *groupSyncReadCurrent_;
+  dynamixel::GroupSyncRead *groupSyncReadProfileAcc_;
 };
 
 #endif // TURTLEBOT3_CONVEYOR_MOTOR_DRIVER_H_

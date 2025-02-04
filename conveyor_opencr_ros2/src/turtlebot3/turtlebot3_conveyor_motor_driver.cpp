@@ -74,6 +74,12 @@ bool Turtlebot3MotorDriver::init(void)
 
   groupSyncWriteVelocity_ = new dynamixel::GroupSyncWrite(portHandler_, packetHandler_, ADDR_X_GOAL_VELOCITY, LEN_X_GOAL_VELOCITY);
   groupSyncWritePosition_ = new dynamixel::GroupSyncWrite(portHandler_, packetHandler_, ADDR_X_GOAL_POSITION, LEN_X_GOAL_POSITION);
+  groupSyncWriteProfileAcc_ = new dynamixel::GroupSyncWrite(portHandler_, packetHandler_, ADDR_X_PROFILE_ACCELERATION, LEN_X_PROFILE_ACCELERATION);
+  groupSyncReadPosition_ = new dynamixel::GroupSyncRead(portHandler_, packetHandler_, ADDR_X_PRESENT_POSITION, LEN_X_PRESENT_POSITION);
+  groupSyncReadVelocity_ = new dynamixel::GroupSyncRead(portHandler_, packetHandler_, ADDR_X_PRESENT_VELOCITY, LEN_X_GOAL_VELOCITY);
+  groupSyncReadCurrent_ = new dynamixel::GroupSyncRead(portHandler_, packetHandler_, ADDR_X_PRESENT_CURRENT, LEN_X_PRESENT_CURRENT);
+  groupSyncReadProfileAcc_ = new dynamixel::GroupSyncRead(portHandler_, packetHandler_, ADDR_X_PROFILE_ACCELERATION, LEN_X_PROFILE_ACCELERATION);
+
 
   Serial.println("SUCESSS");
 
@@ -225,139 +231,187 @@ bool Turtlebot3MotorDriver::getMotorTorque(uint8_t id)
   }
 }
 
+
 bool Turtlebot3MotorDriver::read_present_position(int32_t positions[MotorLocation::MOTOR_NUM_MAX])
 {
+  bool dxl_addparam_result_;
+  int8_t dxl_comm_result_;
 
-  for(int i=0;i<MotorLocation::MOTOR_NUM_MAX;i++)
+  for (int i = 0;i<MotorLocation::MOTOR_NUM_MAX;i++)
   {
-    uint32_t position;
-    uint8_t dxl_error = 0;
-    int dxl_comm_result = COMM_TX_FAIL;
-
-    dxl_comm_result = packetHandler_->read4ByteTxRx(portHandler_, i, ADDR_X_PRESENT_POSITION, &position, &dxl_error);
-    if(dxl_comm_result != COMM_SUCCESS)
-    {
-      packetHandler_->getTxRxResult(dxl_comm_result);
+    dxl_addparam_result_ = groupSyncReadPosition_->addParam(i);
+    if (dxl_addparam_result_ != true)
       return false;
-    }
-    else if(dxl_error != 0)
-    {
-      packetHandler_->getRxPacketError(dxl_error);
-      return false;
-    }
-
-    positions[i] = static_cast<int32_t>(position);
-
+  }
+  dxl_comm_result_ = groupSyncReadPosition_->txRxPacket();
+  if (dxl_comm_result_ != COMM_SUCCESS)
+  {
+    packetHandler_->getTxRxResult(dxl_comm_result_);
+    return false;
   }
 
+  for (int i = 0;i<MotorLocation::MOTOR_NUM_MAX;i++)
+  {
+    if(!groupSyncReadPosition_->isAvailable(i,  ADDR_X_PRESENT_POSITION, LEN_X_PRESENT_POSITION))
+    {
+      return false;
+    }
+    
+  }
+
+  for (int i = 0;i<MotorLocation::MOTOR_NUM_MAX;i++)
+  {
+    uint32_t data = groupSyncReadPosition_->getData(i,  ADDR_X_PRESENT_POSITION, LEN_X_PRESENT_POSITION);
+    positions[i] = static_cast<int32_t>(data);
+  }
+
+  groupSyncReadPosition_->clearParam();
+
   return true;
+
 }
+
+
 
 bool Turtlebot3MotorDriver::read_present_velocity(int32_t velocities[MotorLocation::MOTOR_NUM_MAX])
 {
+  bool dxl_addparam_result_;
+  int8_t dxl_comm_result_;
 
-  for(int i=0;i<MotorLocation::MOTOR_NUM_MAX;i++)
+  for (int i = 0;i<MotorLocation::MOTOR_NUM_MAX;i++)
   {
-    uint32_t velocity;
-    uint8_t dxl_error = 0;
-    int dxl_comm_result = COMM_TX_FAIL;
-
-    dxl_comm_result = packetHandler_->read4ByteTxRx(portHandler_, i, ADDR_X_PRESENT_VELOCITY, &velocity, &dxl_error);
-    if(dxl_comm_result != COMM_SUCCESS)
-    {
-      packetHandler_->getTxRxResult(dxl_comm_result);
+    dxl_addparam_result_ = groupSyncReadVelocity_->addParam(i);
+    if (dxl_addparam_result_ != true)
       return false;
-    }
-    else if(dxl_error != 0)
-    {
-      packetHandler_->getRxPacketError(dxl_error);
-      return false;
-    }
-
-    velocities[i] = static_cast<int32_t>(velocity);
-
+  }
+  dxl_comm_result_ = groupSyncReadVelocity_->txRxPacket();
+  if (dxl_comm_result_ != COMM_SUCCESS)
+  {
+    packetHandler_->getTxRxResult(dxl_comm_result_);
+    return false;
   }
 
+  for (int i = 0;i<MotorLocation::MOTOR_NUM_MAX;i++)
+  {
+    if(!groupSyncReadVelocity_->isAvailable(i,  ADDR_X_PRESENT_VELOCITY, LEN_X_PRESENT_VELOCITY))
+    {
+      return false;
+    }
+    
+  }
+
+  for (int i = 0;i<MotorLocation::MOTOR_NUM_MAX;i++)
+  {
+    uint32_t data = groupSyncReadVelocity_->getData(i,  ADDR_X_PRESENT_VELOCITY, LEN_X_PRESENT_VELOCITY);
+    velocities[i] = static_cast<int32_t>(data);
+  }
+
+  groupSyncReadVelocity_->clearParam();
+
   return true;
+
 }
+
 
 bool Turtlebot3MotorDriver::read_present_current(int16_t currents[MotorLocation::MOTOR_NUM_MAX])
 {
+  bool dxl_addparam_result_;
+  int8_t dxl_comm_result_;
 
-  for(int i=0;i<MotorLocation::MOTOR_NUM_MAX;i++)
+  for (int i = 0;i<MotorLocation::MOTOR_NUM_MAX;i++)
   {
-    uint16_t current;
-    uint8_t dxl_error = 0;
-    int dxl_comm_result = COMM_TX_FAIL;
-
-    dxl_comm_result = packetHandler_->read2ByteTxRx(portHandler_, i, ADDR_X_PRESENT_CURRENT, &current, &dxl_error);
-    if(dxl_comm_result != COMM_SUCCESS)
-    {
-      packetHandler_->getTxRxResult(dxl_comm_result);
+    dxl_addparam_result_ = groupSyncReadCurrent_->addParam(i);
+    if (dxl_addparam_result_ != true)
       return false;
-    }
-    else if(dxl_error != 0)
-    {
-      packetHandler_->getRxPacketError(dxl_error);
-      return false;
-    }
-
-    currents[i] = static_cast<int32_t>(current);
-
+  }
+  dxl_comm_result_ = groupSyncReadCurrent_->txRxPacket();
+  if (dxl_comm_result_ != COMM_SUCCESS)
+  {
+    packetHandler_->getTxRxResult(dxl_comm_result_);
+    return false;
   }
 
+  for (int i = 0;i<MotorLocation::MOTOR_NUM_MAX;i++)
+  {
+    if(!groupSyncReadCurrent_->isAvailable(i,  ADDR_X_PRESENT_CURRENT, LEN_X_PRESENT_CURRENT))
+    {
+      return false;
+    }
+    
+  }
+
+  for (int i = 0;i<MotorLocation::MOTOR_NUM_MAX;i++)
+  {
+    uint32_t data = groupSyncReadCurrent_->getData(i,  ADDR_X_PRESENT_CURRENT, LEN_X_PRESENT_CURRENT);
+    currents[i] = static_cast<int16_t>(data);
+  }
+
+  groupSyncReadCurrent_->clearParam();
+
   return true;
+
 }
+
 
 bool Turtlebot3MotorDriver::read_profile_acceleration(uint32_t profiles[MotorLocation::MOTOR_NUM_MAX])
 {
+  bool dxl_addparam_result_;
+  int8_t dxl_comm_result_;
 
-  for(int i=0;i<MotorLocation::MOTOR_NUM_MAX;i++)
+  for (int i = 0;i<MotorLocation::MOTOR_NUM_MAX;i++)
   {
-    uint8_t dxl_error = 0;
-    int dxl_comm_result = COMM_TX_FAIL;
-
-    dxl_comm_result = packetHandler_->read4ByteTxRx(portHandler_, i, ADDR_X_PROFILE_ACCELERATION, &profiles[i], &dxl_error);
-    if(dxl_comm_result != COMM_SUCCESS)
-    {
-      packetHandler_->getTxRxResult(dxl_comm_result);
+    dxl_addparam_result_ = groupSyncReadProfileAcc_->addParam(i);
+    if (dxl_addparam_result_ != true)
       return false;
-    }
-    else if(dxl_error != 0)
-    {
-      packetHandler_->getRxPacketError(dxl_error);
-      return false;
-    }
-
-
+  }
+  dxl_comm_result_ = groupSyncReadProfileAcc_->txRxPacket();
+  if (dxl_comm_result_ != COMM_SUCCESS)
+  {
+    packetHandler_->getTxRxResult(dxl_comm_result_);
+    return false;
   }
 
+  for (int i = 0;i<MotorLocation::MOTOR_NUM_MAX;i++)
+  {
+    if(!groupSyncReadProfileAcc_->isAvailable(i,  ADDR_X_PROFILE_ACCELERATION, LEN_X_PROFILE_ACCELERATION))
+    {
+      return false;
+    }
+    
+  }
+
+  for (int i = 0;i<MotorLocation::MOTOR_NUM_MAX;i++)
+  {
+    uint32_t data = groupSyncReadProfileAcc_->getData(i,  ADDR_X_PROFILE_ACCELERATION, LEN_X_PROFILE_ACCELERATION);
+    profiles[i] = data;
+  }
+
+  groupSyncReadProfileAcc_->clearParam();
+
   return true;
+
 }
 
 bool Turtlebot3MotorDriver::write_profile_acceleration(uint32_t profiles[MotorLocation::MOTOR_NUM_MAX])
 {
+  bool dxl_addparam_result_;
+  int8_t dxl_comm_result_;
 
-  for(int i=0;i<MotorLocation::MOTOR_NUM_MAX;i++)
+  for (int i = 0;i<MotorLocation::MOTOR_NUM_MAX;i++)
   {
-    uint8_t dxl_error = 0;
-    int dxl_comm_result = COMM_TX_FAIL;
-
-    dxl_comm_result = packetHandler_->write4ByteTxRx(portHandler_, i, ADDR_X_PROFILE_ACCELERATION, profiles[i], &dxl_error);
-    if(dxl_comm_result != COMM_SUCCESS)
-    {
-      packetHandler_->getTxRxResult(dxl_comm_result);
+    dxl_addparam_result_ = groupSyncWriteProfileAcc_->addParam(i, (uint8_t*)&profiles[i]);
+    if (dxl_addparam_result_ != true)
       return false;
-    }
-    else if(dxl_error != 0)
-    {
-      packetHandler_->getRxPacketError(dxl_error);
-      return false;
-    }
-
-
   }
 
+  dxl_comm_result_ = groupSyncWriteProfileAcc_->txPacket();
+  if (dxl_comm_result_ != COMM_SUCCESS)
+  {
+    packetHandler_->getTxRxResult(dxl_comm_result_);
+    return false;
+  }
+
+  groupSyncWriteProfileAcc_->clearParam();
   return true;
 }
 

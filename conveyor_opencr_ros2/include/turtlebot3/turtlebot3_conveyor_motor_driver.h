@@ -19,8 +19,8 @@
 #ifndef TURTLEBOT3_CONVEYOR_MOTOR_DRIVER_H_
 #define TURTLEBOT3_CONVEYOR_MOTOR_DRIVER_H_
 
-#include <Dynamixel2Arduino.h>//for turtlebot3.cpp
-#include <DynamixelSDK.h>//for driving motors
+
+#include <Dynamixel2Arduino.h>
 
 #define TORQUE_ENABLE ControlTableItem::TORQUE_ENABLE
 
@@ -50,7 +50,7 @@
 #define LEN_X_PRESENT_VELOCITY          4
 #define LEN_X_PRESENT_POSITION          4
 
-#define PROTOCOL_VERSION                2.0     // Dynamixel protocol version 2.0
+// #define PROTOCOL_VERSION                2.0     // Dynamixel protocol version 2.0
 
 enum MotorLocation{
   WHEEL_L_R = 0,
@@ -73,12 +73,6 @@ enum VelocityType{
 };
 
 
-#define BAUDRATE                        57600 // baud rate of Dynamixel
-#define DEVICENAME                      ""      // no need setting on OpenCR
-
-#define TORQUE_ENABLE                   1       // Value for enabling the torque
-#define TORQUE_DISABLE                  0       // Value for disabling the torque
-
 class Turtlebot3MotorDriver
 {
  public:
@@ -86,42 +80,33 @@ class Turtlebot3MotorDriver
   ~Turtlebot3MotorDriver();
   bool init(void);
   void close(void);//
-  void closeDynamixel(void);
 
-  bool motor_is_connected(uint8_t id);//
   bool is_connected();//
 
   bool set_torque(bool onoff);//for all motors
-  bool setMotorTorque(uint8_t id, bool onoff);
   bool get_torque();//
-  bool getMotorTorque(uint8_t id);
+
 
   bool read_present_position(int32_t positions[MotorLocation::MOTOR_NUM_MAX]);
   bool read_present_velocity(int32_t velocities[MotorLocation::MOTOR_NUM_MAX]);
   bool read_present_current(int16_t currents[MotorLocation::MOTOR_NUM_MAX]);
   bool read_profile_acceleration(uint32_t profiles[MotorLocation::MOTOR_NUM_MAX]);
 
-  bool setProfileAcceleration(uint8_t id, uint32_t value);
-  bool setProfileVelocity(uint8_t id, uint32_t value);
   bool controlJoints(int32_t *value);
   bool controlWheels(int32_t *value);
 
   bool write_profile_acceleration(uint32_t profiles[MotorLocation::MOTOR_NUM_MAX]);
 
+  Dynamixel2Arduino& getDxl();
+
+  bool torque_;
+
  private:
-  uint32_t baudrate_;
-  float  protocol_version_;
 
-  dynamixel::PortHandler *portHandler_;
-  dynamixel::PacketHandler *packetHandler_;
 
-  dynamixel::GroupSyncWrite *groupSyncWriteVelocity_;
-  dynamixel::GroupSyncWrite *groupSyncWritePosition_;
-  dynamixel::GroupSyncWrite *groupSyncWriteProfileAcc_;
-  dynamixel::GroupSyncRead *groupSyncReadPosition_;
-  dynamixel::GroupSyncRead *groupSyncReadVelocity_;
-  dynamixel::GroupSyncRead *groupSyncReadCurrent_;
-  dynamixel::GroupSyncRead *groupSyncReadProfileAcc_;
+
+
+
 };
 
 #endif // TURTLEBOT3_CONVEYOR_MOTOR_DRIVER_H_

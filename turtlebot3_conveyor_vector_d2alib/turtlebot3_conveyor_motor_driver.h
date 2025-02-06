@@ -74,11 +74,11 @@ enum VelocityType{
 };
 
 
-#define BAUDRATE                        57600 // baud rate of Dynamixel
-#define DEVICENAME                      ""      // no need setting on OpenCR
+// #define BAUDRATE                        57600 // baud rate of Dynamixel
+// #define DEVICENAME                      ""      // no need setting on OpenCR
 
-#define TORQUE_ENABLE                   1       // Value for enabling the torque
-#define TORQUE_DISABLE                  0       // Value for disabling the torque
+// #define TORQUE_ENABLE                   1       // Value for enabling the torque
+// #define TORQUE_DISABLE                  0       // Value for disabling the torque
 
 class Turtlebot3MotorDriver
 {

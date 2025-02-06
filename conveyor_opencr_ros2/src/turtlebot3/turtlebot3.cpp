@@ -33,7 +33,7 @@ static float goal_velocity_from_rc100[VelocityType::TYPE_NUM_MAX] = {0.0, 0.0, 0
 static float goal_velocity_from_button[VelocityType::TYPE_NUM_MAX] = {0.0, 0.0, 0.0};
 
 static void update_goal_velocity_from_3values(void);
-static void test_motors_with_buttons(uint8_t buttons);
+static void test_motors_with_buttons(uint8_t buttons,uint32_t interval_ms);
 static bool get_connection_state_with_motors();
 static void set_connection_state_with_motors(bool is_connected);
 static bool get_connection_state_with_joints();
@@ -429,7 +429,7 @@ void TurtleBot3Core::run()
   // Update Voltage
   diagnosis.updateVoltageCheck(true);
   // Check push button pressed for simple test drive
-  test_motors_with_buttons(diagnosis.getButtonPress(3000));//////////////
+  test_motors_with_buttons(diagnosis.getButtonPress(3000),INTERVAL_MS_TO_UPDATE_CONTROL_ITEM);//////////////
 
   /* For sensing and run buzzer */
   // Update the IMU unit
@@ -448,7 +448,7 @@ void TurtleBot3Core::run()
   update_imu(INTERVAL_MS_TO_UPDATE_CONTROL_ITEM);
   update_times(INTERVAL_MS_TO_UPDATE_CONTROL_ITEM);
   update_gpios(INTERVAL_MS_TO_UPDATE_CONTROL_ITEM);
-  update_motor_status(INTERVAL_MS_TO_UPDATE_CONTROL_ITEM);///////////////
+  update_motor_status(INTERVAL_MS_TO_UPDATE_CONTROL_ITEM);///////////////CHANGING THIS TO 500 SPEEDS UP BEEP
   update_battery_status(INTERVAL_MS_TO_UPDATE_CONTROL_ITEM);
   update_analog_sensors(INTERVAL_MS_TO_UPDATE_CONTROL_ITEM);
 
@@ -625,7 +625,8 @@ void update_motor_status(uint32_t interval_ms)
         }
       }
 
-      control_items.motor_torque_enable_state = motor_driver.get_torque();
+      control_items.motor_torque_enable_state = motor_driver.get_torque();//UNCOMMENT IF NEEED!!!!
+      //  control_items.motor_torque_enable_state = motor_driver.torque_;
     }
   }  
 }
@@ -775,7 +776,7 @@ const float TICK2RAD = 0.001533981; // 0.087890625[deg] * 3.14159265359 / 180 = 
 const float TEST_DISTANCE = 0.300; // meter
 const float TEST_RADIAN = 3.14; // 180 degree
 
-void test_motors_with_buttons(uint8_t buttons)
+void test_motors_with_buttons(uint8_t buttons,uint32_t interval_ms)
 {
 
   // if (buttons & (1<<0))  //hold one button to start moving
@@ -795,55 +796,63 @@ void test_motors_with_buttons(uint8_t buttons)
 
 ////////////////////////////////////////////////////////////////////////////
 
-  static bool move[VelocityType::TYPE_NUM_MAX] = {false, false,false};
-  // static int32_t saved_tick[2] = {0,0};
-  static double diff_encoder = 0.0;
-  static int32_t saved_tick[MotorLocation::MOTOR_NUM_MAX] = {0,};
-  // int32_t current_tick[2] = {0,0};
-  int32_t current_tick[MotorLocation::MOTOR_NUM_MAX] = {0,};
+  static uint32_t pre_time;
+  
 
-
-  if(get_connection_state_with_motors() == true){
-    motor_driver.read_present_position(current_tick);
-  }
-
-  if (buttons & (1<<0))  
+  if(millis() - pre_time >= interval_ms)
   {
-    move[VelocityType::LINEAR_X] = true;
-    saved_tick[MotorLocation::WHEEL_L_R] = current_tick[MotorLocation::WHEEL_L_R];
+    pre_time = millis();
 
-    diff_encoder = TEST_DISTANCE / (0.207 / 4096); // (Circumference of Wheel) / (The number of tick per revolution)
-  }
-  else if (buttons & (1<<1))
-  {
-    move[VelocityType::ANGULAR] = true;
-    saved_tick[MotorLocation::WHEEL_L_R] = current_tick[MotorLocation::WHEEL_L_R];
+    static bool move[VelocityType::TYPE_NUM_MAX] = {false, false,false};
+    // static int32_t saved_tick[2] = {0,0};
+    static double diff_encoder = 0.0;
+    static int32_t saved_tick[MotorLocation::MOTOR_NUM_MAX] = {0,};
+    // int32_t current_tick[2] = {0,0};
+    int32_t current_tick[MotorLocation::MOTOR_NUM_MAX] = {0,};
 
-    diff_encoder = (TEST_RADIAN * 0.13) / (0.207 / 4096);
-  }
 
-  if (move[VelocityType::LINEAR_X])
-  {    
-    if (abs(saved_tick[MotorLocation::WHEEL_L_R] - current_tick[MotorLocation::WHEEL_L_R]) <= diff_encoder)
-    {
-      goal_velocity_from_button[VelocityType::LINEAR_X]  = 0.05;
+    if(get_connection_state_with_motors() == true){
+      motor_driver.read_present_position(current_tick);
     }
-    else
+
+    if (buttons & (1<<0))  
     {
-      goal_velocity_from_button[VelocityType::LINEAR_X]  = 0.0;
-      move[VelocityType::LINEAR_X] = false;
+      move[VelocityType::LINEAR_X] = true;
+      saved_tick[MotorLocation::WHEEL_L_R] = current_tick[MotorLocation::WHEEL_L_R];
+
+      diff_encoder = TEST_DISTANCE / (0.207 / 4096); // (Circumference of Wheel) / (The number of tick per revolution)
     }
-  }
-  else if (move[VelocityType::ANGULAR])
-  {   
-    if (abs(saved_tick[MotorLocation::WHEEL_L_R] - current_tick[MotorLocation::WHEEL_L_R]) <= diff_encoder)
+    else if (buttons & (1<<1))
     {
-      goal_velocity_from_button[VelocityType::ANGULAR]= -0.7;
+      move[VelocityType::ANGULAR] = true;
+      saved_tick[MotorLocation::WHEEL_L_R] = current_tick[MotorLocation::WHEEL_L_R];
+
+      diff_encoder = (TEST_RADIAN * 0.13) / (0.207 / 4096);
     }
-    else
-    {
-      goal_velocity_from_button[VelocityType::ANGULAR]  = 0.0;
-      move[VelocityType::ANGULAR] = false;
+
+    if (move[VelocityType::LINEAR_X])
+    {    
+      if (abs(saved_tick[MotorLocation::WHEEL_L_R] - current_tick[MotorLocation::WHEEL_L_R]) <= diff_encoder)
+      {
+        goal_velocity_from_button[VelocityType::LINEAR_X]  = 0.05;
+      }
+      else
+      {
+        goal_velocity_from_button[VelocityType::LINEAR_X]  = 0.0;
+        move[VelocityType::LINEAR_X] = false;
+      }
+    }
+    else if (move[VelocityType::ANGULAR])
+    {   
+      if (abs(saved_tick[MotorLocation::WHEEL_L_R] - current_tick[MotorLocation::WHEEL_L_R]) <= diff_encoder)
+      {
+        goal_velocity_from_button[VelocityType::ANGULAR]= -0.7;
+      }
+      else
+      {
+        goal_velocity_from_button[VelocityType::ANGULAR]  = 0.0;
+        move[VelocityType::ANGULAR] = false;
+      }
     }
   }
 }

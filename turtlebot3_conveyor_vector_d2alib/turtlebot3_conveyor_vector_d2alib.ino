@@ -71,7 +71,7 @@ void loop()
   //   Serial.print(" Pos ");
   //   Serial.print(i);
   //   Serial.print(" : ");
-  //   Serial.print(output_profiles[i]);
+  //   Serial.print(currents[i]);
   // }
   // Serial.println();
 

@@ -81,7 +81,7 @@ DYNAMIXEL::USBSerialPortHandler port_dxl_slave(SERIAL_DXL_SLAVE);
 DYNAMIXEL::Slave dxl_slave(port_dxl_slave, MODEL_NUM_DXL_SLAVE);
 
 enum ControlTableItemAddr{
-  // ADDR_MODEL_INFORM    = 2,
+  ADDR_MODEL_INFORM    = 2,
   
   ADDR_MILLIS          = 10,
 
@@ -260,8 +260,8 @@ void TurtleBot3Core::begin()
   DEBUG_PRINTLN(ret==true?"RC100 Controller setup completed.":"RC100 Controller setup failed.");
 
 
-  // DEBUG_PRINT("Dynamixel2Arduino Item Max : ");
-  // DEBUG_PRINTLN(CONTROL_ITEM_MAX);
+  DEBUG_PRINT("Dynamixel2Arduino Item Max : ");
+  DEBUG_PRINTLN(CONTROL_ITEM_MAX);
 
   control_items.debug_mode = false;
   control_items.is_connect_ros2_node = false;
@@ -275,7 +275,8 @@ void TurtleBot3Core::begin()
 
   /* Add control items for Slave */
   // Items for model information of device
-  // dxl_slave.addControlItem(ADDR_MODEL_INFORM, control_items.model_inform);
+  control_items.model_inform = 1;
+  dxl_slave.addControlItem(ADDR_MODEL_INFORM, control_items.model_inform);
   // Items for Timer of device
   dxl_slave.addControlItem(ADDR_MILLIS, control_items.dev_time_millis);
 
@@ -429,7 +430,7 @@ void TurtleBot3Core::run()
   // Update Voltage
   diagnosis.updateVoltageCheck(true);
   // Check push button pressed for simple test drive
-  test_motors_with_buttons(diagnosis.getButtonPress(3000),INTERVAL_MS_TO_UPDATE_CONTROL_ITEM);//////////////
+  test_motors_with_buttons(diagnosis.getButtonPress(3000),INTERVAL_MS_TO_UPDATE_BUTTON);//////////////
 
   /* For sensing and run buzzer */
   // Update the IMU unit

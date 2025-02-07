@@ -21,7 +21,7 @@
 // #include "../../include/turtlebot3/turtlebot3_conveyor_motor_driver.h"
 
 const float DXL_PORT_PROTOCOL_VERSION = 2.0; // Dynamixel protocol version 2.0
-const uint32_t DXL_PORT_BAUDRATE = 57600; // baurd rate of Dynamixel
+const uint32_t DXL_PORT_BAUDRATE = 1000000; // baurd rate of Dynamixel
 const int OPENCR_DXL_DIR_PIN = 84; // Arduino pin number of DYNAMIXEL direction pin on OpenCR.
 
 ParamForSyncReadInst_t sync_read_param;

@@ -73,7 +73,7 @@ enum VelocityType{
 };
 
 
-#define BAUDRATE                        57600 // baud rate of Dynamixel
+#define BAUDRATE                        1000000 // baud rate of Dynamixel
 #define DEVICENAME                      ""      // no need setting on OpenCR
 
 #define TORQUE_ENABLE                   1       // Value for enabling the torque

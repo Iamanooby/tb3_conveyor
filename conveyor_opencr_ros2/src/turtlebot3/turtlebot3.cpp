@@ -449,7 +449,7 @@ void TurtleBot3Core::run()
   update_imu(INTERVAL_MS_TO_UPDATE_CONTROL_ITEM);
   update_times(INTERVAL_MS_TO_UPDATE_CONTROL_ITEM);
   update_gpios(INTERVAL_MS_TO_UPDATE_CONTROL_ITEM);
-  update_motor_status(INTERVAL_MS_TO_UPDATE_CONTROL_ITEM);///////////////CHANGING THIS TO 500 SPEEDS UP BEEP
+  update_motor_status(INTERVAL_MS_TO_UPDATE_MOTOR);///////////////CHANGING THIS TO 500 SPEEDS UP BEEP
   update_battery_status(INTERVAL_MS_TO_UPDATE_CONTROL_ITEM);
   update_analog_sensors(INTERVAL_MS_TO_UPDATE_CONTROL_ITEM);
 
@@ -465,21 +465,20 @@ void TurtleBot3Core::run()
     }
     update_goal_velocity_from_3values();
     if(get_connection_state_with_motors() == true){
-      // motor_driver.control_motors(p_tb3_model_info->wheel_separation, goal_velocity[VelocityType::LINEAR_X] + goal_velocity[VelocityType::LINEAR_Y], goal_velocity[VelocityType::ANGULAR]);
 
-      static uint32_t previous_time = 0;
-      uint32_t present_time = millis();
+      // static uint32_t previous_time = 0;
+      // uint32_t present_time = millis();
 
       conveyor.setParams(goal_velocity[VelocityType::LINEAR_X],goal_velocity[VelocityType::LINEAR_Y],goal_velocity[VelocityType::ANGULAR]);
 
-      if((present_time - previous_time) >= (LOOP_TIME_SEC * 1000))
-      {
+      // if((present_time - previous_time) >= (LOOP_TIME_SEC * 1000))
+      // {
 
         motor_driver.controlJoints(conveyor.setJointAngle());
         motor_driver.controlWheels(conveyor.setWheelVel());
-        previous_time = millis();
+        // previous_time = millis();
 
-      }
+      // }
     }
   }  
 }
@@ -617,14 +616,14 @@ void update_motor_status(uint32_t interval_ms)
 
 
       motor_driver.read_present_position(control_items.present_position);
-      motor_driver.read_present_velocity(control_items.present_velocity);
+      // motor_driver.read_present_velocity(control_items.present_velocity);
 
-      if(motor_driver.read_present_current(currents) == true){
-        for (int i = 0; i<MotorLocation::MOTOR_NUM_MAX;i++)
-        {
-          control_items.present_current[i] = currents[i];
-        }
-      }
+      // if(motor_driver.read_present_current(currents) == true){
+      //   for (int i = 0; i<MotorLocation::MOTOR_NUM_MAX;i++)
+      //   {
+      //     control_items.present_current[i] = currents[i];
+      //   }
+      // }
 
       control_items.motor_torque_enable_state = motor_driver.get_torque();//UNCOMMENT IF NEEED!!!!
       //  control_items.motor_torque_enable_state = motor_driver.torque_;
@@ -816,8 +815,13 @@ void test_motors_with_buttons(uint8_t buttons,uint32_t interval_ms)
     int32_t current_tick[MotorLocation::MOTOR_NUM_MAX] = {0,};
 
 
-    if(get_connection_state_with_motors() == true){
-      motor_driver.read_present_position(current_tick);
+    // if(get_connection_state_with_motors() == true){
+    //   motor_driver.read_present_position(current_tick);
+    // }
+
+    for (int i = 0;i<MotorLocation::MOTOR_NUM_MAX;i++)
+    {
+      current_tick[i] = control_items.present_position[i];
     }
 
     if (buttons & (1<<0))  

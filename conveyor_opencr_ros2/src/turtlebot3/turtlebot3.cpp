@@ -642,6 +642,10 @@ static void dxl_slave_write_callback_func(uint16_t item_addr, uint8_t &dxl_err_c
 
   switch(item_addr)
   {
+    case ADDR_MODEL_INFORM:
+      control_items.model_inform = 1;
+      dxl_err_code = DXL_ERR_ACCESS;
+      break;
 
     case ADDR_DEBUG_MODE:
       if (control_items.debug_mode == true)

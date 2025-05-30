@@ -155,32 +155,33 @@ enum ControlTableItemAddr{
   // ADDR_PROFILE_ACC_L      = 174,
   // ADDR_PROFILE_ACC_R      = 178,
 
-  ADDR_PRESENT_CURRENT_WHEEL_L_R      = 174,
-  ADDR_PRESENT_CURRENT_WHEEL_L_F      = 178,
-  ADDR_PRESENT_CURRENT_WHEEL_R_R      = 182,
-  ADDR_PRESENT_CURRENT_WHEEL_R_F      = 186,
-  ADDR_PRESENT_CURRENT_JOINT_L_R      = 190,
-  ADDR_PRESENT_CURRENT_JOINT_L_F      = 194,
-  ADDR_PRESENT_CURRENT_JOINT_R_R      = 198,
-  ADDR_PRESENT_CURRENT_JOINT_R_F      = 202,
+  ADDR_PRESENT_POSITION_WHEEL_L_R      = 174,
+  ADDR_PRESENT_POSITION_WHEEL_L_F      = 178,
+  ADDR_PRESENT_POSITION_WHEEL_R_R      = 182,
+  ADDR_PRESENT_POSITION_WHEEL_R_F      = 186,
+  ADDR_PRESENT_POSITION_JOINT_L_R      = 190,
+  ADDR_PRESENT_POSITION_JOINT_L_F      = 194,
+  ADDR_PRESENT_POSITION_JOINT_R_R      = 198,
+  ADDR_PRESENT_POSITION_JOINT_R_F      = 202,
 
-  ADDR_PRESENT_VELOCITY_WHEEL_L_R      = 220,
-  ADDR_PRESENT_VELOCITY_WHEEL_L_F      = 224,
-  ADDR_PRESENT_VELOCITY_WHEEL_R_R      = 228,
-  ADDR_PRESENT_VELOCITY_WHEEL_R_F      = 232,
-  ADDR_PRESENT_VELOCITY_JOINT_L_R      = 236,
-  ADDR_PRESENT_VELOCITY_JOINT_L_F      = 240,
-  ADDR_PRESENT_VELOCITY_JOINT_R_R      = 244,
-  ADDR_PRESENT_VELOCITY_JOINT_R_F      = 248,
 
-  ADDR_PRESENT_POSITION_WHEEL_L_R      = 260,
-  ADDR_PRESENT_POSITION_WHEEL_L_F      = 264,
-  ADDR_PRESENT_POSITION_WHEEL_R_R      = 268,
-  ADDR_PRESENT_POSITION_WHEEL_R_F      = 272,
-  ADDR_PRESENT_POSITION_JOINT_L_R      = 276,
-  ADDR_PRESENT_POSITION_JOINT_L_F      = 280,
-  ADDR_PRESENT_POSITION_JOINT_R_R      = 284,
-  ADDR_PRESENT_POSITION_JOINT_R_F      = 288,
+  // ADDR_PRESENT_VELOCITY_WHEEL_L_R      = 220,
+  // ADDR_PRESENT_VELOCITY_WHEEL_L_F      = 224,
+  // ADDR_PRESENT_VELOCITY_WHEEL_R_R      = 228,
+  // ADDR_PRESENT_VELOCITY_WHEEL_R_F      = 232,
+  // ADDR_PRESENT_VELOCITY_JOINT_L_R      = 236,
+  // ADDR_PRESENT_VELOCITY_JOINT_L_F      = 240,
+  // ADDR_PRESENT_VELOCITY_JOINT_R_R      = 244,
+  // ADDR_PRESENT_VELOCITY_JOINT_R_F      = 248,
+
+  // ADDR_PRESENT_CURRENT_WHEEL_L_R      = 260,
+  // ADDR_PRESENT_CURRENT_WHEEL_L_F      = 264,
+  // ADDR_PRESENT_CURRENT_WHEEL_R_R      = 268,
+  // ADDR_PRESENT_CURRENT_WHEEL_R_F      = 272,
+  // ADDR_PRESENT_CURRENT_JOINT_L_R      = 276,
+  // ADDR_PRESENT_CURRENT_JOINT_L_F      = 280,
+  // ADDR_PRESENT_CURRENT_JOINT_R_R      = 284,
+  // ADDR_PRESENT_CURRENT_JOINT_R_F      = 288,
 
 };
 
@@ -323,6 +324,33 @@ void TurtleBot3Core::begin()
   dxl_slave.addControlItem(ADDR_ORIENTATION_X, control_items.orientation[1]);
   dxl_slave.addControlItem(ADDR_ORIENTATION_Y, control_items.orientation[2]);
   dxl_slave.addControlItem(ADDR_ORIENTATION_Z, control_items.orientation[3]);
+
+  // Items to control motors
+
+  dxl_slave.addControlItem(ADDR_PROFILE_ACC_WHEEL_L_F, control_items.profile_acceleration[MotorLocation::WHEEL_L_F]);
+  dxl_slave.addControlItem(ADDR_PROFILE_ACC_WHEEL_R_F, control_items.profile_acceleration[MotorLocation::WHEEL_R_F]);
+  dxl_slave.addControlItem(ADDR_PROFILE_ACC_WHEEL_R_R, control_items.profile_acceleration[MotorLocation::WHEEL_R_R]);
+  dxl_slave.addControlItem(ADDR_PROFILE_ACC_WHEEL_L_R, control_items.profile_acceleration[MotorLocation::WHEEL_L_R]);
+  
+  dxl_slave.addControlItem(ADDR_PROFILE_ACC_JOINT_R_F, control_items.profile_acceleration[MotorLocation::JOINT_R_F]);
+  dxl_slave.addControlItem(ADDR_PROFILE_ACC_JOINT_L_F, control_items.profile_acceleration[MotorLocation::JOINT_L_F]);
+  dxl_slave.addControlItem(ADDR_PROFILE_ACC_JOINT_R_R, control_items.profile_acceleration[MotorLocation::JOINT_R_R]);
+  dxl_slave.addControlItem(ADDR_PROFILE_ACC_JOINT_L_R, control_items.profile_acceleration[MotorLocation::JOINT_L_R]);
+
+
+  dxl_slave.addControlItem(ADDR_MOTOR_CONNECT, control_items.is_connect_motors);
+  dxl_slave.addControlItem(ADDR_MOTOR_TORQUE, control_items.motor_torque_enable_state);
+  dxl_slave.addControlItem(ADDR_CMD_VEL_LINEAR_X, control_items.cmd_vel_linear[0]);
+  dxl_slave.addControlItem(ADDR_CMD_VEL_LINEAR_Y, control_items.cmd_vel_linear[1]);
+  dxl_slave.addControlItem(ADDR_CMD_VEL_LINEAR_Z, control_items.cmd_vel_linear[2]);
+  dxl_slave.addControlItem(ADDR_CMD_VEL_ANGULAR_X, control_items.cmd_vel_angular[0]);
+  dxl_slave.addControlItem(ADDR_CMD_VEL_ANGULAR_Y, control_items.cmd_vel_angular[1]);
+  dxl_slave.addControlItem(ADDR_CMD_VEL_ANGULAR_Z, control_items.cmd_vel_angular[2]);  
+  // dxl_slave.addControlItem(ADDR_PROFILE_ACC_L, control_items.profile_acceleration[MotorLocation::LEFT]);
+  // dxl_slave.addControlItem(ADDR_PROFILE_ACC_R, control_items.profile_acceleration[MotorLocation::RIGHT]);
+
+
+
   // Items to check status of motors
 
   dxl_slave.addControlItem(ADDR_PRESENT_POSITION_WHEEL_R_F, control_items.present_position[MotorLocation::WHEEL_R_F]);
@@ -335,25 +363,25 @@ void TurtleBot3Core::begin()
   dxl_slave.addControlItem(ADDR_PRESENT_POSITION_JOINT_R_R, control_items.present_position[MotorLocation::JOINT_R_R]);
   dxl_slave.addControlItem(ADDR_PRESENT_POSITION_JOINT_L_R, control_items.present_position[MotorLocation::JOINT_L_R]);
   
-  dxl_slave.addControlItem(ADDR_PRESENT_VELOCITY_WHEEL_R_F, control_items.present_velocity[MotorLocation::WHEEL_R_F]);
-  dxl_slave.addControlItem(ADDR_PRESENT_VELOCITY_WHEEL_L_F, control_items.present_velocity[MotorLocation::WHEEL_L_F]);
-  dxl_slave.addControlItem(ADDR_PRESENT_VELOCITY_WHEEL_R_R, control_items.present_velocity[MotorLocation::WHEEL_R_R]);
-  dxl_slave.addControlItem(ADDR_PRESENT_VELOCITY_WHEEL_L_R, control_items.present_velocity[MotorLocation::WHEEL_L_R]);
+  // dxl_slave.addControlItem(ADDR_PRESENT_VELOCITY_WHEEL_R_F, control_items.present_velocity[MotorLocation::WHEEL_R_F]);
+  // dxl_slave.addControlItem(ADDR_PRESENT_VELOCITY_WHEEL_L_F, control_items.present_velocity[MotorLocation::WHEEL_L_F]);
+  // dxl_slave.addControlItem(ADDR_PRESENT_VELOCITY_WHEEL_R_R, control_items.present_velocity[MotorLocation::WHEEL_R_R]);
+  // dxl_slave.addControlItem(ADDR_PRESENT_VELOCITY_WHEEL_L_R, control_items.present_velocity[MotorLocation::WHEEL_L_R]);
   
-  dxl_slave.addControlItem(ADDR_PRESENT_VELOCITY_JOINT_R_F, control_items.present_velocity[MotorLocation::JOINT_R_F]);
-  dxl_slave.addControlItem(ADDR_PRESENT_VELOCITY_JOINT_L_F, control_items.present_velocity[MotorLocation::JOINT_L_F]);
-  dxl_slave.addControlItem(ADDR_PRESENT_VELOCITY_JOINT_R_R, control_items.present_velocity[MotorLocation::JOINT_R_R]);
-  dxl_slave.addControlItem(ADDR_PRESENT_VELOCITY_JOINT_L_R, control_items.present_velocity[MotorLocation::JOINT_L_R]);
+  // dxl_slave.addControlItem(ADDR_PRESENT_VELOCITY_JOINT_R_F, control_items.present_velocity[MotorLocation::JOINT_R_F]);
+  // dxl_slave.addControlItem(ADDR_PRESENT_VELOCITY_JOINT_L_F, control_items.present_velocity[MotorLocation::JOINT_L_F]);
+  // dxl_slave.addControlItem(ADDR_PRESENT_VELOCITY_JOINT_R_R, control_items.present_velocity[MotorLocation::JOINT_R_R]);
+  // dxl_slave.addControlItem(ADDR_PRESENT_VELOCITY_JOINT_L_R, control_items.present_velocity[MotorLocation::JOINT_L_R]);
   
-  dxl_slave.addControlItem(ADDR_PRESENT_CURRENT_WHEEL_L_F, control_items.present_current[MotorLocation::WHEEL_L_F]);
-  dxl_slave.addControlItem(ADDR_PRESENT_CURRENT_WHEEL_R_F, control_items.present_current[MotorLocation::WHEEL_R_F]);
-  dxl_slave.addControlItem(ADDR_PRESENT_CURRENT_WHEEL_R_R, control_items.present_current[MotorLocation::WHEEL_R_R]);
-  dxl_slave.addControlItem(ADDR_PRESENT_CURRENT_WHEEL_L_R, control_items.present_current[MotorLocation::WHEEL_L_R]);
+  // dxl_slave.addControlItem(ADDR_PRESENT_CURRENT_WHEEL_L_F, control_items.present_current[MotorLocation::WHEEL_L_F]);
+  // dxl_slave.addControlItem(ADDR_PRESENT_CURRENT_WHEEL_R_F, control_items.present_current[MotorLocation::WHEEL_R_F]);
+  // dxl_slave.addControlItem(ADDR_PRESENT_CURRENT_WHEEL_R_R, control_items.present_current[MotorLocation::WHEEL_R_R]);
+  // dxl_slave.addControlItem(ADDR_PRESENT_CURRENT_WHEEL_L_R, control_items.present_current[MotorLocation::WHEEL_L_R]);
   
-  dxl_slave.addControlItem(ADDR_PRESENT_CURRENT_JOINT_R_F, control_items.present_current[MotorLocation::JOINT_R_F]);
-  dxl_slave.addControlItem(ADDR_PRESENT_CURRENT_JOINT_L_F, control_items.present_current[MotorLocation::JOINT_L_F]);
-  dxl_slave.addControlItem(ADDR_PRESENT_CURRENT_JOINT_R_R, control_items.present_current[MotorLocation::JOINT_R_R]);
-  dxl_slave.addControlItem(ADDR_PRESENT_CURRENT_JOINT_L_R, control_items.present_current[MotorLocation::JOINT_L_R]);
+  // dxl_slave.addControlItem(ADDR_PRESENT_CURRENT_JOINT_R_F, control_items.present_current[MotorLocation::JOINT_R_F]);
+  // dxl_slave.addControlItem(ADDR_PRESENT_CURRENT_JOINT_L_F, control_items.present_current[MotorLocation::JOINT_L_F]);
+  // dxl_slave.addControlItem(ADDR_PRESENT_CURRENT_JOINT_R_R, control_items.present_current[MotorLocation::JOINT_R_R]);
+  // dxl_slave.addControlItem(ADDR_PRESENT_CURRENT_JOINT_L_R, control_items.present_current[MotorLocation::JOINT_L_R]);
   
 
   // dxl_slave.addControlItem(ADDR_PRESENT_POSITION_L, control_items.present_position[MotorLocation::LEFT]);
@@ -362,27 +390,7 @@ void TurtleBot3Core::begin()
   // dxl_slave.addControlItem(ADDR_PRESENT_VELOCITY_R, control_items.present_velocity[MotorLocation::RIGHT]);
   // dxl_slave.addControlItem(ADDR_PRESENT_CURRENT_L, control_items.present_current[MotorLocation::LEFT]);
   // dxl_slave.addControlItem(ADDR_PRESENT_CURRENT_R, control_items.present_current[MotorLocation::RIGHT]);
-  // Items to control motors
-  dxl_slave.addControlItem(ADDR_MOTOR_CONNECT, control_items.is_connect_motors);
-  dxl_slave.addControlItem(ADDR_MOTOR_TORQUE, control_items.motor_torque_enable_state);
-  dxl_slave.addControlItem(ADDR_CMD_VEL_LINEAR_X, control_items.cmd_vel_linear[0]);
-  dxl_slave.addControlItem(ADDR_CMD_VEL_LINEAR_Y, control_items.cmd_vel_linear[1]);
-  dxl_slave.addControlItem(ADDR_CMD_VEL_LINEAR_Z, control_items.cmd_vel_linear[2]);
-  dxl_slave.addControlItem(ADDR_CMD_VEL_ANGULAR_X, control_items.cmd_vel_angular[0]);
-  dxl_slave.addControlItem(ADDR_CMD_VEL_ANGULAR_Y, control_items.cmd_vel_angular[1]);
-  dxl_slave.addControlItem(ADDR_CMD_VEL_ANGULAR_Z, control_items.cmd_vel_angular[2]);  
-  // dxl_slave.addControlItem(ADDR_PROFILE_ACC_L, control_items.profile_acceleration[MotorLocation::LEFT]);
-  // dxl_slave.addControlItem(ADDR_PROFILE_ACC_R, control_items.profile_acceleration[MotorLocation::RIGHT]);
 
-  dxl_slave.addControlItem(ADDR_PROFILE_ACC_WHEEL_L_F, control_items.profile_acceleration[MotorLocation::WHEEL_L_F]);
-  dxl_slave.addControlItem(ADDR_PROFILE_ACC_WHEEL_R_F, control_items.profile_acceleration[MotorLocation::WHEEL_R_F]);
-  dxl_slave.addControlItem(ADDR_PROFILE_ACC_WHEEL_R_R, control_items.profile_acceleration[MotorLocation::WHEEL_R_R]);
-  dxl_slave.addControlItem(ADDR_PROFILE_ACC_WHEEL_L_R, control_items.profile_acceleration[MotorLocation::WHEEL_L_R]);
-  
-  dxl_slave.addControlItem(ADDR_PROFILE_ACC_JOINT_R_F, control_items.profile_acceleration[MotorLocation::JOINT_R_F]);
-  dxl_slave.addControlItem(ADDR_PROFILE_ACC_JOINT_L_F, control_items.profile_acceleration[MotorLocation::JOINT_L_F]);
-  dxl_slave.addControlItem(ADDR_PROFILE_ACC_JOINT_R_R, control_items.profile_acceleration[MotorLocation::JOINT_R_R]);
-  dxl_slave.addControlItem(ADDR_PROFILE_ACC_JOINT_L_R, control_items.profile_acceleration[MotorLocation::JOINT_L_R]);
   
 
   // Set user callback function for processing write command from master.
